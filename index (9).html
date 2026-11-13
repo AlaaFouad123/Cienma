@@ -1,0 +1,4237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CINEMORA – Enter Another Dimension</title>
+  <!-- Google Fonts: Orbitron, Space Grotesk & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <!-- Three.js r128 via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       1. DESIGN TOKENS & GLOBAL RESET
+       ========================================================================== */
+    :root {
+      --bg-dark-purple: #160B35;
+      --bg-deep-space: #0D0622;
+      --electric-violet: #7928CA;
+      --neon-blue: #27C9FF;
+      --vibrant-orange: #FF7A30;
+      --hot-pink: #FF3D8D;
+      --gold-vip: #FFB800;
+      --white: #FFFFFF;
+      --text-muted: #B8B0D8;
+      --glass-bg: rgba(28, 15, 68, 0.58);
+      --glass-bg-strong: rgba(20, 10, 50, 0.86);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-border-neon: rgba(39, 201, 255, 0.45);
+      --gradient-primary: linear-gradient(135deg, #7928CA 0%, #FF3D8D 50%, #FF7A30 100%);
+      --gradient-cyber: linear-gradient(135deg, #27C9FF 0%, #7928CA 100%);
+      --gradient-glow: radial-gradient(circle at 50% 0%, rgba(121, 40, 202, 0.45), transparent 70%);
+      --shadow-neon-blue: 0 0 24px rgba(39, 201, 255, 0.35);
+      --shadow-neon-pink: 0 0 28px rgba(255, 61, 141, 0.4);
+      --shadow-card: 0 18px 45px rgba(5, 2, 18, 0.65);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-pill: 999px;
+      --transition-smooth: all 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-dark-purple);
+      color: var(--white);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 12% 18%, rgba(121, 40, 202, 0.28) 0%, transparent 42%),
+        radial-gradient(circle at 88% 35%, rgba(39, 201, 255, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 50% 82%, rgba(255, 61, 141, 0.2) 0%, transparent 50%),
+        linear-gradient(180deg, #0D0622 0%, #160B35 45%, #11072B 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0D0622;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--electric-violet), var(--neon-blue));
+      border-radius: 99px;
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.04em;
+    }
+
+    .font-tech {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section {
+      padding: 96px 0;
+      position: relative;
+    }
+
+    /* ==========================================================================
+       2. REUSABLE GLASSMORPHISM & GLOWING BUTTONS
+       ========================================================================== */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 13px 26px;
+      border-radius: var(--radius-pill);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: var(--white);
+      box-shadow: 0 8px 25px rgba(255, 61, 141, 0.42);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 34px rgba(255, 61, 141, 0.65), 0 0 20px rgba(255, 122, 48, 0.5);
+    }
+
+    .btn-cyber {
+      background: rgba(39, 201, 255, 0.14);
+      border: 1.5px solid var(--neon-blue);
+      color: var(--neon-blue);
+      box-shadow: 0 0 18px rgba(39, 201, 255, 0.2);
+    }
+
+    .btn-cyber:hover {
+      background: var(--neon-blue);
+      color: #0D0622;
+      box-shadow: 0 0 30px rgba(39, 201, 255, 0.65);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--white);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: var(--neon-blue);
+    }
+
+    .btn-sm {
+      padding: 9px 18px;
+      font-size: 0.8rem;
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 42px;
+    }
+
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--neon-blue);
+      margin-bottom: 10px;
+    }
+
+    .section-eyebrow::before {
+      content: "";
+      width: 24px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--neon-blue), var(--hot-pink));
+      border-radius: 2px;
+    }
+
+    .section-title {
+      font-size: clamp(1.75rem, 3.4vw, 2.7rem);
+      font-weight: 800;
+      line-height: 1.15;
+      background: linear-gradient(90deg, #FFFFFF 0%, #D9CCFF 60%, #27C9FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Scroll Reveal Animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==========================================================================
+       3. STICKY GLASSMORPHIC NAVIGATION BAR
+       ========================================================================== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 14px 0;
+      background: rgba(16, 8, 42, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition-smooth);
+    }
+
+    .navbar.scrolled {
+      padding: 10px 0;
+      background: rgba(13, 6, 34, 0.92);
+      border-bottom-color: rgba(39, 201, 255, 0.3);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 1.38rem;
+      letter-spacing: 0.08em;
+      color: var(--white);
+    }
+
+    .brand-emblem {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #7928CA, #27C9FF);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 20px rgba(39, 201, 255, 0.55);
+      animation: emblemPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes emblemPulse {
+      0%, 100% { box-shadow: 0 0 18px rgba(39, 201, 255, 0.5); transform: rotate(0deg); }
+      50% { box-shadow: 0 0 28px rgba(255, 61, 141, 0.75); transform: rotate(6deg); }
+    }
+
+    .brand-logo span {
+      background: linear-gradient(90deg, #FFFFFF, #27C9FF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      position: relative;
+      padding: 6px 2px;
+      transition: var(--transition-smooth);
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--white);
+      text-shadow: 0 0 12px rgba(39, 201, 255, 0.7);
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--neon-blue), var(--hot-pink));
+      transition: width 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .nav-links a:hover::after,
+    .nav-links a.active::after {
+      width: 100%;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-search-input {
+      width: 185px;
+      padding: 8px 14px 8px 36px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 0.85rem;
+      color: var(--white);
+      transition: var(--transition-smooth);
+    }
+
+    .nav-search-input:focus {
+      outline: none;
+      width: 230px;
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 15px rgba(39, 201, 255, 0.3);
+      background: rgba(22, 11, 53, 0.9);
+    }
+
+    .nav-search-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--neon-blue);
+      pointer-events: none;
+      display: flex;
+    }
+
+    .ticket-badge-pill {
+      position: relative;
+    }
+
+    .ticket-count-dot {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      min-width: 19px;
+      height: 19px;
+      padding: 0 5px;
+      border-radius: 99px;
+      background: var(--hot-pink);
+      color: var(--white);
+      font-size: 0.7rem;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 10px var(--hot-pink);
+    }
+
+    .mobile-toggle {
+      display: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+    }
+
+    /* ==========================================================================
+       4. HERO SECTION WITH INTERACTIVE 3D WEBGL CANVAS
+       ========================================================================== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 110px;
+      padding-bottom: 70px;
+      overflow: hidden;
+    }
+
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      display: block;
+    }
+
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 25% 50%, rgba(22, 11, 53, 0.72) 0%, rgba(22, 11, 53, 0.25) 55%, rgba(13, 6, 34, 0.85) 100%),
+        linear-gradient(180deg, rgba(13, 6, 34, 0.4) 0%, transparent 30%, transparent 75%, #160B35 100%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      max-width: 680px;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 18px;
+      border-radius: var(--radius-pill);
+      background: rgba(121, 40, 202, 0.28);
+      border: 1px solid rgba(39, 201, 255, 0.45);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--neon-blue);
+      margin-bottom: 22px;
+      box-shadow: 0 0 24px rgba(39, 201, 255, 0.25);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--hot-pink);
+      box-shadow: 0 0 12px var(--hot-pink);
+      animation: ping 1.8s infinite;
+    }
+
+    @keyframes ping {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.6); opacity: 0.45; }
+    }
+
+    .hero-title {
+      font-size: clamp(2.35rem, 5.4vw, 4.35rem);
+      font-weight: 900;
+      line-height: 1.08;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      text-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
+    }
+
+    .hero-title .gradient-text {
+      background: linear-gradient(90deg, #27C9FF 0%, #FF3D8D 52%, #FF7A30 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+      color: #DDD6F8;
+      max-width: 560px;
+      margin-bottom: 34px;
+      line-height: 1.65;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 44px;
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(110px, 1fr));
+      gap: 16px;
+      max-width: 520px;
+      padding: 18px 22px;
+      border-radius: var(--radius-md);
+      background: rgba(22, 11, 53, 0.65);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .metric-item h4 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--neon-blue);
+    }
+
+    .metric-item p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ==========================================================================
+       5. MOVIES CATALOG (NOW SHOWING, COMING SOON, POPULAR)
+       ========================================================================== */
+    .catalog-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 22px;
+      margin-bottom: 32px;
+    }
+
+    .category-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      padding: 9px 18px;
+      border-radius: var(--radius-pill);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid transparent;
+      transition: var(--transition-smooth);
+    }
+
+    .tab-btn:hover {
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .tab-btn.active {
+      color: var(--white);
+      background: linear-gradient(135deg, rgba(121, 40, 202, 0.85), rgba(39, 201, 255, 0.55));
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 18px rgba(39, 201, 255, 0.35);
+    }
+
+    .filter-right {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .genre-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .genre-pill {
+      padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: var(--transition-smooth);
+    }
+
+    .genre-pill:hover,
+    .genre-pill.active {
+      color: #0D0622;
+      background: var(--neon-blue);
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 15px rgba(39, 201, 255, 0.45);
+    }
+
+    .cyber-select, .cyber-input {
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      background: rgba(15, 7, 38, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--white);
+      font-size: 0.88rem;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+
+    .cyber-select:focus, .cyber-input:focus {
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 14px rgba(39, 201, 255, 0.28);
+    }
+
+    .slider-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .slider-arrow {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--white);
+      display: grid;
+      place-items: center;
+      transition: var(--transition-smooth);
+    }
+
+    .slider-arrow:hover {
+      background: var(--electric-violet);
+      border-color: var(--neon-blue);
+      box-shadow: var(--shadow-neon-blue);
+    }
+
+    /* Movie Grid / Horizontal Slider Hybrid */
+    .movies-track {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 28px;
+      transition: transform 0.4s ease;
+    }
+
+    .movies-track.slider-mode {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 16px;
+      scrollbar-width: thin;
+    }
+
+    .movies-track.slider-mode .movie-card {
+      min-width: 295px;
+      max-width: 295px;
+      scroll-snap-align: start;
+    }
+
+    .movie-card {
+      position: relative;
+      border-radius: var(--radius-lg);
+      background: rgba(25, 13, 62, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.22s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .movie-card:hover {
+      border-color: rgba(39, 201, 255, 0.6);
+      box-shadow: 0 22px 48px rgba(10, 4, 30, 0.85), 0 0 28px rgba(121, 40, 202, 0.45);
+    }
+
+    .movie-poster-wrap {
+      position: relative;
+      aspect-ratio: 2 / 3;
+      overflow: hidden;
+      background: #0D0622;
+      cursor: pointer;
+    }
+
+    .movie-poster-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      display: block;
+    }
+
+    .movie-card:hover .movie-poster-wrap img {
+      transform: scale(1.07);
+    }
+
+    .poster-overlay-badges {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .rating-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: var(--radius-pill);
+      background: rgba(13, 6, 34, 0.82);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 184, 0, 0.5);
+      color: var(--gold-vip);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .status-pill {
+      padding: 5px 11px;
+      border-radius: var(--radius-pill);
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: linear-gradient(135deg, var(--hot-pink), var(--vibrant-orange));
+      color: var(--white);
+    }
+
+    .movie-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .movie-meta-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--neon-blue);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .movie-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.22rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 10px;
+      line-height: 1.28;
+    }
+
+    .format-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .format-badge {
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: rgba(39, 201, 255, 0.14);
+      border: 1px solid rgba(39, 201, 255, 0.35);
+      color: var(--neon-blue);
+    }
+
+    .format-badge.imax {
+      background: rgba(255, 61, 141, 0.16);
+      border-color: rgba(255, 61, 141, 0.45);
+      color: #FF82B6;
+    }
+
+    .movie-card-actions {
+      margin-top: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* ==========================================================================
+       6. CINEMA BRANCHES SECTION
+       ========================================================================== */
+    .branches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 24px;
+    }
+
+    .branch-card {
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .branch-card.selected-branch {
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 32px rgba(39, 201, 255, 0.3);
+      background: linear-gradient(160deg, rgba(39, 201, 255, 0.14), rgba(28, 15, 68, 0.75));
+    }
+
+    .branch-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .branch-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.24rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .branch-address {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .facility-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 18px;
+    }
+
+    .facility-chip {
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: rgba(121, 40, 202, 0.3);
+      border: 1px solid rgba(121, 40, 202, 0.6);
+      color: #E5D4FF;
+    }
+
+    .branch-showtimes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .time-chip {
+      padding: 5px 11px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--white);
+      transition: var(--transition-smooth);
+    }
+
+    .time-chip:hover {
+      border-color: var(--neon-blue);
+      color: var(--neon-blue);
+    }
+
+    /* ==========================================================================
+       7. INTERACTIVE CINEMA SEAT BOOKING ENGINE (FLAGSHIP FEATURE)
+       ========================================================================== */
+    .booking-workspace {
+      display: grid;
+      grid-template-columns: 1.65fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .auditorium-panel {
+      padding: 32px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .booking-selectors-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .selector-group label {
+      display: block;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--neon-blue);
+      margin-bottom: 6px;
+    }
+
+    .selector-group select {
+      width: 100%;
+    }
+
+    /* Glowing Curved Cinema Screen */
+    .screen-stage {
+      perspective: 700px;
+      margin: 10px auto 44px;
+      max-width: 560px;
+      text-align: center;
+    }
+
+    .cinema-screen {
+      height: 36px;
+      width: 100%;
+      background: linear-gradient(180deg, #FFFFFF 0%, #27C9FF 65%, rgba(39, 201, 255, 0.15) 100%);
+      border-radius: 50% 50% 10px 10px / 100% 100% 12px 12px;
+      box-shadow:
+        0 12px 45px rgba(39, 201, 255, 0.75),
+        0 28px 80px rgba(121, 40, 202, 0.55);
+      transform: rotateX(-24deg);
+      margin-bottom: 10px;
+    }
+
+    .screen-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.74rem;
+      letter-spacing: 0.35em;
+      color: var(--neon-blue);
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    /* Auditorium Seat Matrix */
+    .seat-map-scroll {
+      overflow-x: auto;
+      padding: 8px 4px 16px;
+    }
+
+    .seat-matrix {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      min-width: 520px;
+      align-items: center;
+    }
+
+    .seat-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .row-label {
+      width: 24px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .seat-aisle {
+      width: 22px;
+    }
+
+    .seat-btn {
+      width: 34px;
+      height: 32px;
+      border-radius: 9px 9px 5px 5px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: transform 0.18s ease, box-shadow 0.2s ease, background 0.2s ease;
+      border-bottom: 3px solid rgba(0, 0, 0, 0.35);
+    }
+
+    /* Seat Color Coding as Requested */
+    .seat-btn.available {
+      background: rgba(39, 201, 255, 0.24);
+      border: 1.5px solid #27C9FF;
+      color: #27C9FF;
+    }
+
+    .seat-btn.available:hover {
+      transform: translateY(-3px) scale(1.08);
+      background: rgba(39, 201, 255, 0.45);
+      box-shadow: 0 0 14px rgba(39, 201, 255, 0.75);
+    }
+
+    .seat-btn.vip {
+      background: rgba(255, 184, 0, 0.22);
+      border: 1.5px solid #FFB800;
+      color: #FFD54F;
+    }
+
+    .seat-btn.vip:hover {
+      transform: translateY(-3px) scale(1.08);
+      background: rgba(255, 184, 0, 0.42);
+      box-shadow: 0 0 15px rgba(255, 184, 0, 0.75);
+    }
+
+    .seat-btn.accessible {
+      background: rgba(39, 201, 255, 0.22);
+      border: 1.5px dashed #27C9FF;
+      color: #FFFFFF;
+    }
+
+    .seat-btn.accessible:hover {
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 0 14px rgba(39, 201, 255, 0.7);
+    }
+
+    .seat-btn.selected {
+      background: linear-gradient(135deg, #7928CA, #A855F7) !important;
+      border: 1.5px solid #E9D5FF !important;
+      color: #FFFFFF !important;
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 0 18px rgba(121, 40, 202, 0.95), 0 0 8px #27C9FF;
+    }
+
+    .seat-btn.booked {
+      background: rgba(255, 61, 141, 0.28);
+      border: 1.5px solid #FF3D8D;
+      color: rgba(255, 255, 255, 0.45);
+      cursor: not-allowed;
+      opacity: 0.72;
+    }
+
+    /* Seat Legend */
+    .seat-legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .legend-swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+    }
+
+    /* Live Booking Summary Card */
+    .summary-panel {
+      padding: 28px;
+      position: sticky;
+      top: 94px;
+    }
+
+    .summary-movie-header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .summary-thumb {
+      width: 64px;
+      height: 92px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid rgba(39, 201, 255, 0.4);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      font-size: 0.9rem;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+
+    .summary-row span:first-child {
+      color: var(--text-muted);
+    }
+
+    .summary-row span:last-child {
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .selected-seats-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      min-height: 34px;
+      margin: 14px 0;
+    }
+
+    .seat-tag {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(121, 40, 202, 0.45);
+      border: 1px solid var(--neon-blue);
+      color: var(--white);
+    }
+
+    .summary-total-box {
+      margin: 20px 0;
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(121, 40, 202, 0.32), rgba(39, 201, 255, 0.16));
+      border: 1px solid rgba(39, 201, 255, 0.4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .total-price-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--neon-blue);
+    }
+
+    /* ==========================================================================
+       8. DEDICATED 3D EXPERIENCE SECTION ('ENTER THE AUDITORIUM')
+       ========================================================================== */
+    .experience-3d-wrapper {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid rgba(39, 201, 255, 0.35);
+      box-shadow: 0 25px 65px rgba(0, 0, 0, 0.75), 0 0 40px rgba(121, 40, 202, 0.35);
+      height: 560px;
+      background: #090418;
+    }
+
+    #auditorium-3d-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+
+    #auditorium-3d-canvas:active {
+      cursor: grabbing;
+    }
+
+    .exp-hud-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+    }
+
+    .exp-top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto;
+    }
+
+    .exp-controls-dock {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      background: rgba(16, 8, 42, 0.8);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      pointer-events: auto;
+    }
+
+    .light-swatch-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      transition: transform 0.2s ease;
+    }
+
+    .light-swatch-btn:hover,
+    .light-swatch-btn.active {
+      transform: scale(1.22);
+      border-color: #FFFFFF;
+      box-shadow: 0 0 14px currentColor;
+    }
+
+    /* ==========================================================================
+       9. MY TICKETS & DIGITAL HOLOGRAPHIC QR TICKET
+       ========================================================================== */
+    .tickets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 26px;
+    }
+
+    .digital-ticket {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 122px;
+      background: linear-gradient(135deg, rgba(34, 17, 84, 0.88), rgba(16, 8, 42, 0.94));
+      border: 1px solid rgba(39, 201, 255, 0.42);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+    }
+
+    .ticket-main-side {
+      padding: 22px;
+      border-right: 2px dashed rgba(39, 201, 255, 0.35);
+      position: relative;
+    }
+
+    .ticket-main-side::before,
+    .ticket-main-side::after {
+      content: "";
+      position: absolute;
+      right: -11px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #140930;
+      border: 1px solid rgba(39, 201, 255, 0.35);
+    }
+
+    .ticket-main-side::before { top: -11px; }
+    .ticket-main-side::after { bottom: -11px; }
+
+    .ticket-qr-side {
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(39, 201, 255, 0.06);
+      text-align: center;
+    }
+
+    .qr-canvas-box {
+      background: #FFFFFF;
+      padding: 6px;
+      border-radius: 10px;
+      box-shadow: 0 0 16px rgba(39, 201, 255, 0.4);
+    }
+
+    .ticket-ref-code {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--neon-blue);
+      letter-spacing: 0.06em;
+    }
+
+    .ticket-status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .ticket-status-badge.upcoming {
+      background: rgba(39, 201, 255, 0.2);
+      color: var(--neon-blue);
+      border: 1px solid var(--neon-blue);
+    }
+
+    .ticket-status-badge.completed {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       10. MODALS (MOVIE DETAILS, CHECKOUT, ADMIN PANEL, AUTH, TRAILER)
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(8, 3, 22, 0.84);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeInModal 0.28s ease;
+    }
+
+    @keyframes fadeInModal {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-dialog {
+      width: 100%;
+      max-width: 920px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: linear-gradient(165deg, #1E0F47 0%, #11072B 100%);
+      border: 1px solid rgba(39, 201, 255, 0.38);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 40px rgba(121, 40, 202, 0.45);
+      position: relative;
+    }
+
+    .modal-dialog.modal-lg {
+      max-width: 1140px;
+    }
+
+    .modal-dialog.modal-sm {
+      max-width: 480px;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 20;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(13, 6, 34, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: var(--white);
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+      transition: var(--transition-smooth);
+    }
+
+    .modal-close-btn:hover {
+      background: var(--hot-pink);
+      border-color: var(--hot-pink);
+      transform: rotate(90deg);
+    }
+
+    /* Movie Details Modal Layout */
+    .details-banner {
+      height: 260px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .details-banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.62);
+    }
+
+    .details-banner-grad {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 10%, #190C3E 100%);
+    }
+
+    .details-body {
+      padding: 0 32px 32px;
+      margin-top: -95px;
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 28px;
+    }
+
+    .details-poster {
+      width: 100%;
+      aspect-ratio: 2/3;
+      border-radius: 16px;
+      object-fit: cover;
+      border: 2px solid rgba(39, 201, 255, 0.55);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
+    }
+
+    .pill-choice-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .choice-pill {
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: var(--text-muted);
+      transition: var(--transition-smooth);
+    }
+
+    .choice-pill.active,
+    .choice-pill:hover {
+      background: rgba(39, 201, 255, 0.22);
+      border-color: var(--neon-blue);
+      color: var(--white);
+    }
+
+    /* Form Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-field label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Admin Dashboard Table & KPIs */
+    .admin-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .kpi-card span {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+    }
+
+    .kpi-card h3 {
+      font-size: 1.55rem;
+      color: var(--neon-blue);
+      margin-top: 6px;
+    }
+
+    .admin-table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    table.admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .admin-table th {
+      background: rgba(121, 40, 202, 0.32);
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--neon-blue);
+      text-transform: uppercase;
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      padding: 14px 20px;
+      border-radius: 14px;
+      background: rgba(20, 10, 52, 0.94);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--neon-blue);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 20px rgba(39, 201, 255, 0.35);
+      color: var(--white);
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideInToast 0.3s ease;
+    }
+
+    .toast.error {
+      border-color: var(--hot-pink);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 20px rgba(255, 61, 141, 0.45);
+    }
+
+    @keyframes slideInToast {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(10, 4, 28, 0.9);
+      padding: 56px 0 32px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 36px;
+    }
+
+    /* ==========================================================================
+       11. RESPONSIVE MEDIA QUERIES
+       ========================================================================== */
+    @media (max-width: 1060px) {
+      .booking-workspace {
+        grid-template-columns: 1fr;
+      }
+      .summary-panel {
+        position: static;
+      }
+      .nav-search-box {
+        display: none;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: rgba(13, 6, 34, 0.97);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 24px;
+        border-bottom: 1px solid rgba(39, 201, 255, 0.35);
+        display: none;
+      }
+      .nav-links.open {
+        display: flex;
+      }
+      .mobile-toggle {
+        display: flex;
+      }
+      .details-body {
+        grid-template-columns: 1fr;
+        margin-top: -65px;
+      }
+      .details-poster {
+        max-width: 180px;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 580px) {
+      section {
+        padding: 68px 0;
+      }
+      .hero-metrics {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .tickets-grid {
+        grid-template-columns: 1fr;
+      }
+      .digital-ticket {
+        grid-template-columns: 1fr;
+      }
+      .ticket-main-side {
+        border-right: none;
+        border-bottom: 2px dashed rgba(39, 201, 255, 0.35);
+      }
+      .ticket-main-side::before,
+      .ticket-main-side::after {
+        display: none;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       1. STICKY GLASSMORPHIC NAVIGATION BAR
+       ======================================================================== -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="#home" class="brand-logo" aria-label="CINEMORA Home">
+        <div class="brand-emblem">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="#FFFFFF" stroke-width="2" />
+            <polygon points="10,8.5 16,12 10,15.5" fill="#FFFFFF" />
+          </svg>
+        </div>
+        <div>CINEM<span>ORA</span></div>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home" class="active">Home</a></li>
+        <li><a href="#movies">Movies</a></li>
+        <li><a href="#cinemas">Cinemas</a></li>
+        <li><a href="#experience-3d">3D Experience</a></li>
+        <li><a href="#booking">Book Seats</a></li>
+        <li><a href="#my-tickets">My Tickets</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div class="nav-search-box">
+          <span class="nav-search-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+          <input type="text" id="globalSearchInput" class="nav-search-input" placeholder="Search movies..." aria-label="Search movies" />
+        </div>
+
+        <a href="#my-tickets" class="btn btn-ghost btn-sm ticket-badge-pill" title="My Booked Tickets">
+          <span>Tickets</span>
+          <span class="ticket-count-dot" id="navTicketCount">1</span>
+        </a>
+
+        <button type="button" class="btn btn-cyber btn-sm" id="openAdminBtn">Admin</button>
+        <button type="button" class="btn btn-primary btn-sm" id="openAuthBtn">Login</button>
+
+        <button type="button" class="mobile-toggle" id="mobileMenuBtn" aria-label="Toggle Navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       2. HERO SECTION WITH INTERACTIVE 3D WEBGL SCENE
+       ======================================================================== -->
+  <section class="hero" id="home">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-vignette"></div>
+
+    <div class="container">
+      <div class="hero-content reveal visible">
+        <div class="hero-pill">
+          <span class="pulse-dot"></span>
+          <span>NEXT-GEN 4D LASER &amp; HOLOGRAPHIC CINEMA</span>
+        </div>
+
+        <h1 class="hero-title">
+          EXPERIENCE MOVIES IN <span class="gradient-text">ANOTHER DIMENSION</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Discover extraordinary stories and immerse yourself in the future of cinema. Step inside volumetric soundscapes, floating 3D worlds, and ultra-luxury laser auditoriums.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="#movies" class="btn btn-primary">
+            <span>Explore Movies</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a href="#booking" class="btn btn-cyber">
+            <span>Book Your Seat</span>
+          </a>
+        </div>
+
+        <div class="hero-metrics">
+          <div class="metric-item">
+            <h4>8K LASER</h4>
+            <p>Holographic Projection</p>
+          </div>
+          <div class="metric-item">
+            <h4>360° ATMOS</h4>
+            <p>Spatial Acoustic Dome</p>
+          </div>
+          <div class="metric-item">
+            <h4>4 BRANCHES</h4>
+            <p>Futuristic Megaplexes</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       3. NOW SHOWING, COMING SOON & POPULAR MOVIES SECTION
+       ======================================================================== -->
+  <section id="movies">
+    <div class="container">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-eyebrow">Curated Multiverse Lineup</div>
+          <h2 class="section-title">FEATURED &amp; NOW SHOWING</h2>
+        </div>
+
+        <div class="slider-controls">
+          <button type="button" class="btn btn-ghost btn-sm" id="toggleLayoutBtn" title="Toggle Grid or Horizontal Slider">
+            Slider View
+          </button>
+          <button type="button" class="slider-arrow" id="sliderPrevBtn" aria-label="Scroll Left">&#10094;</button>
+          <button type="button" class="slider-arrow" id="sliderNextBtn" aria-label="Scroll Right">&#10095;</button>
+        </div>
+      </div>
+
+      <!-- Category Tabs, Search & Sort Controls -->
+      <div class="glass-panel catalog-controls reveal">
+        <div class="category-tabs" id="categoryTabs">
+          <button type="button" class="tab-btn active" data-category="now-showing">Now Showing</button>
+          <button type="button" class="tab-btn" data-category="coming-soon">Coming Soon</button>
+          <button type="button" class="tab-btn" data-category="popular">Popular Movies</button>
+          <button type="button" class="tab-btn" data-category="all">All Releases</button>
+        </div>
+
+        <div class="filter-right">
+          <input type="text" id="catalogSearchInput" class="cyber-input" placeholder="Filter by title or director..." />
+          <select id="sortMoviesSelect" class="cyber-select" aria-label="Sort Movies">
+            <option value="featured">Sort: Featured</option>
+            <option value="rating">Sort: Highest Rated</option>
+            <option value="duration">Sort: Duration</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Genre Filter Pills -->
+      <div class="genre-pills reveal" id="genrePills">
+        <button type="button" class="genre-pill active" data-genre="All">All Genres</button>
+        <button type="button" class="genre-pill" data-genre="Sci-Fi">Sci-Fi</button>
+        <button type="button" class="genre-pill" data-genre="Cyberpunk">Cyberpunk</button>
+        <button type="button" class="genre-pill" data-genre="Action">Action</button>
+        <button type="button" class="genre-pill" data-genre="Thriller">Thriller</button>
+        <button type="button" class="genre-pill" data-genre="Animation">Animation</button>
+      </div>
+
+      <!-- Movie Cards Container -->
+      <div class="movies-track reveal" id="moviesGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       4. CINEMA BRANCHES SECTION
+       ======================================================================== -->
+  <section id="cinemas">
+    <div class="container">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-eyebrow">Global Destination Domes</div>
+          <h2 class="section-title">CINEMORA LOCATIONS</h2>
+        </div>
+        <p style="color: var(--text-muted); max-width: 440px; font-size: 0.94rem;">
+          Select your preferred futuristic multiplex below to synchronize showtimes and auditorium seating availability.
+        </p>
+      </div>
+
+      <div class="branches-grid reveal" id="branchesGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       5. INTERACTIVE CINEMA SEAT BOOKING ENGINE (FLAGSHIP FEATURE)
+       ======================================================================== -->
+  <section id="booking">
+    <div class="container">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-eyebrow">Real-Time Auditorium Matrix</div>
+          <h2 class="section-title">INTERACTIVE SEAT SELECTION</h2>
+        </div>
+        <div style="color: var(--neon-blue); font-family: 'Space Grotesk', sans-serif; font-weight: 700;">
+          Click available seats to toggle • VIP &amp; Accessible rows available
+        </div>
+      </div>
+
+      <div class="booking-workspace reveal">
+        <!-- Left: Interactive Seat Map -->
+        <div class="glass-panel auditorium-panel">
+          <div class="booking-selectors-bar">
+            <div class="selector-group">
+              <label for="bookMovieSelect">Movie</label>
+              <select id="bookMovieSelect" class="cyber-select"></select>
+            </div>
+            <div class="selector-group">
+              <label for="bookBranchSelect">Cinema Branch</label>
+              <select id="bookBranchSelect" class="cyber-select"></select>
+            </div>
+            <div class="selector-group">
+              <label for="bookDateSelect">Date</label>
+              <select id="bookDateSelect" class="cyber-select">
+                <option value="Fri, Nov 13">Fri, Nov 13 (Today)</option>
+                <option value="Sat, Nov 14">Sat, Nov 14</option>
+                <option value="Sun, Nov 15">Sun, Nov 15</option>
+                <option value="Mon, Nov 16">Mon, Nov 16</option>
+              </select>
+            </div>
+            <div class="selector-group">
+              <label for="bookFormatSelect">Format</label>
+              <select id="bookFormatSelect" class="cyber-select">
+                <option value="IMAX 3D">IMAX 3D (+$6)</option>
+                <option value="3D">RealD 3D (+$3)</option>
+                <option value="2D">Laser 2D (Base)</option>
+              </select>
+            </div>
+            <div class="selector-group">
+              <label for="bookTimeSelect">Showtime</label>
+              <select id="bookTimeSelect" class="cyber-select">
+                <option value="18:30">18:30 PM</option>
+                <option value="20:15">20:15 PM</option>
+                <option value="22:45">22:45 PM</option>
+                <option value="00:30">00:30 AM (Midnight)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Curved Glowing Cinema Screen -->
+          <div class="screen-stage">
+            <div class="cinema-screen"></div>
+            <div class="screen-label">CINEMORA LASER IMAX SCREEN</div>
+          </div>
+
+          <!-- Auditorium Rows & Seats -->
+          <div class="seat-map-scroll">
+            <div class="seat-matrix" id="seatMatrix"></div>
+          </div>
+
+          <!-- Seat Color Legend -->
+          <div class="seat-legend">
+            <div class="legend-item">
+              <span class="legend-swatch" style="background: rgba(39, 201, 255, 0.28); border: 1.5px solid #27C9FF;"></span>
+              <span>Available ($14)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch" style="background: linear-gradient(135deg, #7928CA, #A855F7); border: 1.5px solid #E9D5FF;"></span>
+              <span>Selected</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch" style="background: rgba(255, 61, 141, 0.35); border: 1.5px solid #FF3D8D;"></span>
+              <span>Booked</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch" style="background: rgba(255, 184, 0, 0.26); border: 1.5px solid #FFB800;"></span>
+              <span>VIP Recliner ($22)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch" style="background: rgba(39, 201, 255, 0.22); border: 1.5px dashed #27C9FF;"></span>
+              <span>Accessible ($14)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Real-Time Booking Summary -->
+        <aside class="glass-panel summary-panel">
+          <div class="summary-movie-header">
+            <img id="summaryPoster" class="summary-thumb" src="" alt="Selected Movie Poster" />
+            <div>
+              <span style="font-size: 0.74rem; color: var(--neon-blue); font-weight: 700; text-transform: uppercase;">Booking Summary</span>
+              <h3 id="summaryMovieTitle" style="font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; margin-top: 3px;">--</h3>
+              <p id="summaryHall" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Hall 01 • Cyber Dome</p>
+            </div>
+          </div>
+
+          <div class="summary-row">
+            <span>Cinema</span>
+            <span id="summaryBranch">--</span>
+          </div>
+          <div class="summary-row">
+            <span>Date &amp; Time</span>
+            <span id="summaryDateTime">--</span>
+          </div>
+          <div class="summary-row">
+            <span>Experience Format</span>
+            <span id="summaryFormat" style="color: var(--neon-blue);">--</span>
+          </div>
+          <div class="summary-row">
+            <span>Ticket Count</span>
+            <span id="summarySeatCount">0 Seats</span>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Selected Seat Numbers:</span>
+            <div class="selected-seats-badges" id="selectedSeatsBadges">
+              <span style="font-size: 0.82rem; color: rgba(255,255,255,0.45);">No seats selected yet</span>
+            </div>
+          </div>
+
+          <div class="summary-total-box">
+            <div>
+              <div style="font-size: 0.76rem; text-transform: uppercase; color: var(--text-muted);">Total Amount</div>
+              <div style="font-size: 0.75rem; color: var(--neon-blue);" id="priceBreakdownNote">Includes format surcharge</div>
+            </div>
+            <div class="total-price-val" id="summaryTotalPrice">$0.00</div>
+          </div>
+
+          <button type="button" class="btn btn-primary" style="width: 100%;" id="proceedCheckoutBtn">
+            Continue to Checkout
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" style="width: 100%; margin-top: 10px;" id="clearSeatsBtn">
+            Clear Selection
+          </button>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       6. DEDICATED 3D EXPERIENCE SECTION ('ENTER THE AUDITORIUM')
+       ======================================================================== -->
+  <section id="experience-3d">
+    <div class="container">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-eyebrow">Interactive WebGL Showcase</div>
+          <h2 class="section-title">3D CINEMA DIMENSION</h2>
+        </div>
+        <p style="color: var(--text-muted); max-width: 460px; font-size: 0.94rem;">
+          Drag to orbit inside our holographic cinema chamber, switch camera angles, and customize volumetric auditorium lighting in real time.
+        </p>
+      </div>
+
+      <div class="experience-3d-wrapper reveal">
+        <canvas id="auditorium-3d-canvas"></canvas>
+
+        <div class="exp-hud-overlay">
+          <div class="exp-top-bar">
+            <div class="hero-pill" style="margin-bottom: 0;">
+              <span class="pulse-dot"></span>
+              <span>LIVE 3D AUDITORIUM ENGINE • DRAG TO INSPECT</span>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-ghost btn-sm cam-preset-btn" data-cam="stage">Stage View</button>
+              <button type="button" class="btn btn-ghost btn-sm cam-preset-btn" data-cam="balcony">VIP Balcony</button>
+              <button type="button" class="btn btn-ghost btn-sm cam-preset-btn" data-cam="projector">Projector Beam</button>
+            </div>
+          </div>
+
+          <div class="exp-controls-dock">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted);">
+                Ambient Neon Lighting:
+              </span>
+              <button type="button" class="light-swatch-btn active" data-color="#27C9FF" style="background: #27C9FF; color: #27C9FF;" title="Neon Blue"></button>
+              <button type="button" class="light-swatch-btn" data-color="#7928CA" style="background: #7928CA; color: #7928CA;" title="Electric Violet"></button>
+              <button type="button" class="light-swatch-btn" data-color="#FF3D8D" style="background: #FF3D8D; color: #FF3D8D;" title="Hot Pink"></button>
+              <button type="button" class="light-swatch-btn" data-color="#FFB800" style="background: #FFB800; color: #FFB800;" title="Cyber Gold"></button>
+            </div>
+
+            <div style="font-size: 0.82rem; color: var(--neon-blue); font-family: 'Space Grotesk', sans-serif;">
+              Floating 3D Posters • Volumetric Spotlights • Golden Ticket Artifact
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       7. MY TICKETS SECTION (LOCALSTORAGE PERSISTED DIGITAL QR PASSES)
+       ======================================================================== -->
+  <section id="my-tickets">
+    <div class="container">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-eyebrow">Digital Holographic Passes</div>
+          <h2 class="section-title">MY TICKETS</h2>
+        </div>
+
+        <div class="category-tabs" id="ticketFilterTabs">
+          <button type="button" class="tab-btn active" data-ticket-filter="all">All Passes</button>
+          <button type="button" class="tab-btn" data-ticket-filter="upcoming">Upcoming</button>
+          <button type="button" class="tab-btn" data-ticket-filter="completed">Previous</button>
+        </div>
+      </div>
+
+      <div class="tickets-grid reveal" id="myTicketsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       FOOTER
+       ======================================================================== -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="#home" class="brand-logo" style="margin-bottom: 14px;">
+            <div class="brand-emblem">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="#FFFFFF" stroke-width="2" />
+                <polygon points="10,8.5 16,12 10,15.5" fill="#FFFFFF" />
+              </svg>
+            </div>
+            <div>CINEM<span>ORA</span></div>
+          </a>
+          <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 320px;">
+            Enter Another Dimension. Next-generation 3D holographic cinemas engineered for total sensory immersion.
+          </p>
+        </div>
+
+        <div>
+          <h4 style="font-size: 0.92rem; margin-bottom: 14px; color: var(--neon-blue);">EXPERIENCES</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem; color: var(--text-muted);">
+            <li><a href="#movies">IMAX 3D Laser</a></li>
+            <li><a href="#experience-3d">4DX Motion Chamber</a></li>
+            <li><a href="#cinemas">VIP Sky Lounges</a></li>
+            <li><a href="#booking">Private Dome Rentals</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="font-size: 0.92rem; margin-bottom: 14px; color: var(--neon-blue);">NAVIGATION</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem; color: var(--text-muted);">
+            <li><a href="#movies">Now Showing</a></li>
+            <li><a href="#cinemas">Cinema Locations</a></li>
+            <li><a href="#my-tickets">My Digital Tickets</a></li>
+            <li><a href="#booking">Seat Reservation</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="font-size: 0.92rem; margin-bottom: 14px; color: var(--neon-blue);">SYSTEM STATUS</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
+            All laser projectors and spatial audio arrays online.
+          </p>
+          <span class="rating-pill" style="border-color: var(--neon-blue); color: var(--neon-blue);">
+            ● 99.98% UPTIME
+          </span>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 22px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.82rem; color: var(--text-muted);">
+        <span>&copy; 2026 CINEMORA Entertainment Technologies. All rights reserved.</span>
+        <span>Built with HTML5, CSS3, Vanilla ES6+ &amp; Three.js WebGL</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       MODAL 1: INTERACTIVE MOVIE DETAILS & TRAILER PREVIEW
+       ======================================================================== -->
+  <div class="modal-backdrop" id="movieDetailsModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <button type="button" class="modal-close-btn" data-close-modal="movieDetailsModal">&times;</button>
+      <div id="movieDetailsContent"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 2: CHECKOUT & DIGITAL QR TICKET CONFIRMATION
+       ======================================================================== -->
+  <div class="modal-backdrop" id="checkoutModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <button type="button" class="modal-close-btn" data-close-modal="checkoutModal">&times;</button>
+      <div style="padding: 32px;" id="checkoutModalContent"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 3: ADMINISTRATION DASHBOARD
+       ======================================================================== -->
+  <div class="modal-backdrop" id="adminModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-lg">
+      <button type="button" class="modal-close-btn" data-close-modal="adminModal">&times;</button>
+      <div style="padding: 32px;" id="adminModalContent"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 4: LOGIN / SIGN UP DEMO MODAL
+       ======================================================================== -->
+  <div class="modal-backdrop" id="authModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-sm">
+      <button type="button" class="modal-close-btn" data-close-modal="authModal">&times;</button>
+      <div style="padding: 32px;">
+        <div class="section-eyebrow">Cinemora Member Pass</div>
+        <h3 style="font-size: 1.5rem; margin-bottom: 8px;">ENTER YOUR ACCOUNT</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 22px;">
+          Sign in to sync your holographic tickets and earn 2x Nebula rewards.
+        </p>
+
+        <form id="authForm" class="form-grid" style="grid-template-columns: 1fr;">
+          <div class="form-field">
+            <label for="authName">Full Name</label>
+            <input type="text" id="authName" class="cyber-input" placeholder="Nova Vance" required />
+          </div>
+          <div class="form-field">
+            <label for="authEmail">Email Address</label>
+            <input type="email" id="authEmail" class="cyber-input" placeholder="nova@cinemora.io" required />
+          </div>
+          <div class="form-field">
+            <label for="authPass">Password</label>
+            <input type="password" id="authPass" class="cyber-input" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+            Access Cinemora ID
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ========================================================================
+       APPLICATION JAVASCRIPT (ES6+ MODULAR ARCHITECTURE)
+       ======================================================================== -->
+  <script>
+    (() => {
+      'use strict';
+
+      /* ======================================================================
+         1. STORAGE KEYS & DEFAULT REALISTIC FUTURISTIC DATA
+         ====================================================================== */
+      const STORAGE_KEYS = {
+        MOVIES: 'cinemora_movies_v1',
+        BRANCHES: 'cinemora_branches_v1',
+        BOOKINGS: 'cinemora_bookings_v1',
+        BOOKED_SEATS: 'cinemora_booked_seats_v1',
+        USER: 'cinemora_user_v1'
+      };
+
+      const DEFAULT_MOVIES = [
+        {
+          id: 'mov-1',
+          title: 'NEON HORIZON: ZERO GRAVITY',
+          genre: 'Sci-Fi',
+          duration: '2h 28m',
+          durationMins: 148,
+          rating: 9.4,
+          category: 'now-showing',
+          popular: true,
+          formats: ['2D', '3D', 'IMAX 3D'],
+          director: 'Aria Vance',
+          cast: ['Kaelen Voss', 'Elena Rostova', 'Marcus Thorne', 'Sora Takahashi'],
+          releaseYear: 2026,
+          palette: ['#27C9FF', '#7928CA', '#0D0622'],
+          description: 'When a quantum tether around Saturn fractures, an elite orbital salvage crew must navigate a collapsing gravity well to rescue humanity’s first deep-space ark.'
+        },
+        {
+          id: 'mov-2',
+          title: 'CYBERIA 2099: GHOST PROTOCOL',
+          genre: 'Cyberpunk',
+          duration: '2h 14m',
+          durationMins: 134,
+          rating: 9.1,
+          category: 'now-showing',
+          popular: true,
+          formats: ['2D', '3D', 'IMAX 3D'],
+          director: 'Kenji Sato',
+          cast: ['Renjiro Abe', 'Maya Lin', 'Viktor Kaine', 'Zoe Sterling'],
+          releaseYear: 2026,
+          palette: ['#FF3D8D', '#7928CA', '#14082E'],
+          description: 'In rain-drenched Neo-Osaka, a rogue memory-hacker uncovers an AI syndicate rewriting the dreams of ten million citizens.'
+        },
+        {
+          id: 'mov-3',
+          title: 'ASTRAL ODYSSEY',
+          genre: 'Animation',
+          duration: '1h 58m',
+          durationMins: 118,
+          rating: 9.3,
+          category: 'now-showing',
+          popular: true,
+          formats: ['2D', '3D'],
+          director: 'Lucia Moretti',
+          cast: ['Liam Gallagher', 'Chloe Bennet', 'Idris Cole'],
+          releaseYear: 2026,
+          palette: ['#FF7A30', '#FF3D8D', '#1B0A3C'],
+          description: 'A young star-cartographer and her bioluminescent fox traverse floating crystal archipelagos to rekindle a fading constellation.'
+        },
+        {
+          id: 'mov-4',
+          title: 'CHRONO VORTEX',
+          genre: 'Thriller',
+          duration: '2h 19m',
+          durationMins: 139,
+          rating: 8.8,
+          category: 'now-showing',
+          popular: false,
+          formats: ['2D', 'IMAX 3D'],
+          director: 'Damian Cross',
+          cast: ['Julian Mercer', 'Freya Lindqvist', 'Devon Brooks'],
+          releaseYear: 2026,
+          palette: ['#27C9FF', '#FF3D8D', '#0F0726'],
+          description: 'Trapped inside a 12-minute temporal loop aboard a transcontinental bullet train, a physicist must identify the saboteur before reality unravels.'
+        },
+        {
+          id: 'mov-5',
+          title: 'SOLARIS TITAN: OVERDRIVE',
+          genre: 'Action',
+          duration: '2h 32m',
+          durationMins: 152,
+          rating: 8.9,
+          category: 'now-showing',
+          popular: true,
+          formats: ['2D', '3D', 'IMAX 3D'],
+          director: 'Rex Sterling',
+          cast: ['Dante Cruz', 'Tessa Valkyrie', 'Hector Silva'],
+          releaseYear: 2026,
+          palette: ['#FF7A30', '#27C9FF', '#12072B'],
+          description: 'Colossal plasma-powered mechs clash across the volcanic plains of Io in the ultimate championship for interplanetary sovereignty.'
+        },
+        {
+          id: 'mov-6',
+          title: 'ECHOES OF ELYSIUM',
+          genre: 'Sci-Fi',
+          duration: '2h 09m',
+          durationMins: 129,
+          rating: 8.7,
+          category: 'coming-soon',
+          popular: false,
+          formats: ['3D', 'IMAX 3D'],
+          director: 'Serena Chen',
+          cast: ['Noah Kim', 'Isabella Ross', 'Gideon Vance'],
+          releaseYear: 2026,
+          palette: ['#7928CA', '#27C9FF', '#0A051D'],
+          description: 'An acoustic archaeologist decodes harmonic signals hidden inside ancient Martian monoliths, awakening an interstellar beacon.'
+        },
+        {
+          id: 'mov-7',
+          title: 'VELVET SHADOWS',
+          genre: 'Thriller',
+          duration: '2h 04m',
+          durationMins: 124,
+          rating: 8.5,
+          category: 'coming-soon',
+          popular: false,
+          formats: ['2D', '3D'],
+          director: 'Henri Laurent',
+          cast: ['Camille Laurent', 'Sebastian Rook', 'Nadia Petrova'],
+          releaseYear: 2026,
+          palette: ['#FF3D8D', '#FF7A30', '#160B35'],
+          description: 'A high-stakes cyber-heist inside an orbital casino turns deadly when the vault reveals a secret worth more than gold.'
+        },
+        {
+          id: 'mov-8',
+          title: 'STARLIGHT DRIFTERS',
+          genre: 'Animation',
+          duration: '1h 52m',
+          durationMins: 112,
+          rating: 9.0,
+          category: 'coming-soon',
+          popular: true,
+          formats: ['2D', '3D', 'IMAX 3D'],
+          director: 'Mina Park',
+          cast: ['Evan Wright', 'Hana Yoshida', 'Leo Vance'],
+          releaseYear: 2026,
+          palette: ['#27C9FF', '#FFB800', '#13082E'],
+          description: 'Teenage solar-surfers race across comet tails in a dazzling coming-of-age adventure across the outer rim.'
+        }
+      ];
+
+      const DEFAULT_BRANCHES = [
+        {
+          id: 'br-1',
+          name: 'Cinemora Neo-Tokyo Dome',
+          address: '88 Shibuya Skyway, Level 42, Neo-District',
+          halls: ['Hall 01 (IMAX Laser)', 'Hall 02 (4DX)', 'Hall 03 (VIP Sky)'],
+          facilities: ['Laser IMAX 3D', 'Dolby Atmos', '4DX Motion', 'VIP Sky Lounge'],
+          formats: ['2D', '3D', 'IMAX 3D'],
+          showtimes: ['16:00', '18:30', '20:15', '22:45']
+        },
+        {
+          id: 'br-2',
+          name: 'Cinemora Cyber-Plaza Downtown',
+          address: '410 Hologram Boulevard, Central Core',
+          halls: ['Hall A (Grand Dome)', 'Hall B (Neon Sphere)', 'Hall C (VIP)'],
+          facilities: ['8K Dual Laser', 'Dolby Atmos', 'Robotic Valet', 'Cocktail Bar'],
+          formats: ['2D', '3D', 'IMAX 3D'],
+          showtimes: ['15:15', '18:30', '21:00', '23:30']
+        },
+        {
+          id: 'br-3',
+          name: 'Cinemora Astral IMAX Harbour',
+          address: '12 Marina Quantum Pier, Bayfront',
+          halls: ['IMAX Harbour Dome', 'Hall 02 (3D)', 'Hall 03 (2D)'],
+          facilities: ['Giant IMAX Screen', 'Spatial Audio', 'Waterfront Terrace'],
+          formats: ['2D', '3D', 'IMAX 3D'],
+          showtimes: ['17:00', '19:45', '22:15', '00:30']
+        },
+        {
+          id: 'br-4',
+          name: 'Cinemora Quantum Mall',
+          address: '900 Hyperion Atrium, North Sector',
+          halls: ['Hall 01', 'Hall 02', 'Hall 04 (VIP)'],
+          facilities: ['RealD 3D', 'Dolby Atmos', 'Zero-G Recliners', 'Arcade Arena'],
+          formats: ['2D', '3D'],
+          showtimes: ['14:30', '17:30', '20:15', '22:45']
+        }
+      ];
+
+      /* ======================================================================
+         2. PROCEDURAL HIGH-RES POSTER & BANNER GENERATOR (HTML5 CANVAS)
+         ====================================================================== */
+      const posterCache = new Map();
+
+      function generateMovieArtwork(movie, isBanner = false) {
+        const key = `${movie.id}_${isBanner ? 'banner' : 'poster'}_${movie.title}_${movie.genre}`;
+        if (posterCache.has(key)) return posterCache.get(key);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = isBanner ? 960 : 500;
+        canvas.height = isBanner ? 420 : 750;
+        const ctx = canvas.getContext('2d');
+
+        const [c1, c2, c3] = movie.palette || ['#27C9FF', '#7928CA', '#160B35'];
+
+        // Deep Space Base Gradient
+        const bgGrad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        bgGrad.addColorStop(0, c3);
+        bgGrad.addColorStop(0.55, '#12072D');
+        bgGrad.addColorStop(1, '#070314');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Glowing Nebula Orbs
+        const orb1 = ctx.createRadialGradient(
+          canvas.width * 0.72, canvas.height * 0.28, 10,
+          canvas.width * 0.72, canvas.height * 0.28, canvas.width * 0.65
+        );
+        orb1.addColorStop(0, c1 + 'AA');
+        orb1.addColorStop(0.5, c2 + '44');
+        orb1.addColorStop(1, 'transparent');
+        ctx.fillStyle = orb1;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const orb2 = ctx.createRadialGradient(
+          canvas.width * 0.22, canvas.height * 0.72, 10,
+          canvas.width * 0.22, canvas.height * 0.72, canvas.width * 0.55
+        );
+        orb2.addColorStop(0, c2 + '99');
+        orb2.addColorStop(1, 'transparent');
+        ctx.fillStyle = orb2;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Futuristic Geometric Portal Rings
+        ctx.save();
+        ctx.translate(canvas.width * 0.5, canvas.height * (isBanner ? 0.48 : 0.42));
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath();
+          ctx.arc(0, 0, (isBanner ? 85 : 95) + i * 32, 0, Math.PI * 2);
+          ctx.strokeStyle = i % 2 === 0 ? c1 + '66' : c2 + '55';
+          ctx.lineWidth = i === 0 ? 3 : 1.5;
+          ctx.stroke();
+        }
+
+        // Central Glowing Geometric Emblem
+        ctx.beginPath();
+        const sides = movie.genre === 'Sci-Fi' ? 6 : movie.genre === 'Cyberpunk' ? 4 : 3;
+        const rad = isBanner ? 64 : 76;
+        for (let s = 0; s <= sides; s++) {
+          const ang = (s * 2 * Math.PI) / sides - Math.PI / 2;
+          const x = Math.cos(ang) * rad;
+          const y = Math.sin(ang) * rad;
+          if (s === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = '#FFFFFFCC';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.restore();
+
+        // Starfield Particles
+        let seed = movie.title.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 17);
+        const pseudoRand = () => {
+          seed = (seed * 9301 + 49297) % 233280;
+          return seed / 233280;
+        };
+        for (let i = 0; i < 65; i++) {
+          const sx = pseudoRand() * canvas.width;
+          const sy = pseudoRand() * canvas.height;
+          const sr = pseudoRand() * 2 + 0.5;
+          ctx.fillStyle = i % 3 === 0 ? c1 : '#FFFFFF';
+          ctx.globalAlpha = 0.35 + pseudoRand() * 0.65;
+          ctx.beginPath();
+          ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        // Perspective Cyber Grid at Bottom
+        ctx.strokeStyle = c1 + '33';
+        ctx.lineWidth = 1;
+        const horizon = canvas.height * 0.74;
+        for (let g = 0; g < 8; g++) {
+          const y = horizon + g * ((canvas.height - horizon) / 7);
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+        }
+
+        // Bottom Vignette for Crisp Typography
+        const fade = ctx.createLinearGradient(0, canvas.height * 0.45, 0, canvas.height);
+        fade.addColorStop(0, 'transparent');
+        fade.addColorStop(0.7, 'rgba(10, 4, 28, 0.85)');
+        fade.addColorStop(1, 'rgba(8, 3, 22, 0.98)');
+        ctx.fillStyle = fade;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if (!isBanner) {
+          // Brand Watermark Top
+          ctx.fillStyle = 'rgba(255,255,255,0.75)';
+          ctx.font = '700 13px "Orbitron", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('CINEMORA ORIGINAL PRESENTATION', canvas.width / 2, canvas.height - 148);
+
+          // Movie Title Wrap
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = '900 30px "Orbitron", sans-serif';
+          const words = movie.title.split(' ');
+          let line = '';
+          let yPos = canvas.height - 105;
+          for (let n = 0; n < words.length; n++) {
+            const testLine = line + words[n] + ' ';
+            if (ctx.measureText(testLine).width > canvas.width - 56 && n > 0) {
+              ctx.fillText(line.trim(), canvas.width / 2, yPos);
+              line = words[n] + ' ';
+              yPos += 36;
+            } else {
+              line = testLine;
+            }
+          }
+          ctx.fillText(line.trim(), canvas.width / 2, yPos);
+
+          // Director Credit Bottom
+          ctx.fillStyle = c1;
+          ctx.font = '600 14px "Space Grotesk", sans-serif';
+          ctx.fillText(`DIRECTED BY ${movie.director.toUpperCase()} • ${movie.genre.toUpperCase()}`, canvas.width / 2, canvas.height - 28);
+        }
+
+        const dataUrl = canvas.toDataURL('image/png');
+        posterCache.set(key, dataUrl);
+        return dataUrl;
+      }
+
+      /* ======================================================================
+         3. STATE MANAGEMENT & LOCALSTORAGE PERSISTENCE
+         ====================================================================== */
+      function loadFromStorage(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (err) {
+          console.warn('Storage read error:', err);
+          return fallback;
+        }
+      }
+
+      function saveToStorage(key, data) {
+        try {
+          localStorage.setItem(key, JSON.stringify(data));
+        } catch (err) {
+          console.warn('Storage write error:', err);
+        }
+      }
+
+      const state = {
+        movies: loadFromStorage(STORAGE_KEYS.MOVIES, DEFAULT_MOVIES),
+        branches: loadFromStorage(STORAGE_KEYS.BRANCHES, DEFAULT_BRANCHES),
+        bookings: loadFromStorage(STORAGE_KEYS.BOOKINGS, []),
+        bookedSeatsMap: loadFromStorage(STORAGE_KEYS.BOOKED_SEATS, {}),
+        user: loadFromStorage(STORAGE_KEYS.USER, null),
+
+        // Catalog Filters
+        activeCategory: 'now-showing',
+        activeGenre: 'All',
+        searchQuery: '',
+        sortBy: 'featured',
+        sliderMode: false,
+
+        // Booking Selection State
+        booking: {
+          movieId: 'mov-1',
+          branchId: 'br-1',
+          date: 'Fri, Nov 13',
+          format: 'IMAX 3D',
+          time: '20:15',
+          selectedSeats: [] // Array of { id: 'D5', type: 'standard' | 'vip' | 'accessible', price: number }
+        },
+
+        ticketFilter: 'all'
+      };
+
+      // Ensure at least 1 realistic sample booking exists on first visit
+      if (state.bookings.length === 0) {
+        state.bookings = [
+          {
+            ref: 'CNM-88420',
+            movieId: 'mov-1',
+            movieTitle: 'NEON HORIZON: ZERO GRAVITY',
+            branchName: 'Cinemora Neo-Tokyo Dome',
+            hall: 'Hall 01 (IMAX Laser)',
+            date: 'Fri, Nov 13',
+            time: '20:15',
+            format: 'IMAX 3D',
+            seats: ['F5', 'F6'],
+            totalPrice: 56.00,
+            customerName: 'Alex Mercer',
+            customerEmail: 'alex@cinemora.io',
+            status: 'upcoming',
+            createdAt: new Date().toISOString()
+          }
+        ];
+        saveToStorage(STORAGE_KEYS.BOOKINGS, state.bookings);
+      }
+
+      /* ======================================================================
+         4. TOAST NOTIFICATION & MODAL HELPERS
+         ====================================================================== */
+      function showToast(message, isError = false) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${isError ? 'error' : ''}`;
+        toast.innerHTML = `
+          <span style="color: ${isError ? '#FF3D8D' : '#27C9FF'}; font-size: 1.1rem;">
+            ${isError ? '&#9888;' : '&#10022;'}
+          </span>
+          <span>${message}</span>
+        `;
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(30px)';
+          setTimeout(() => toast.remove(), 300);
+        }, 3400);
+      }
+
+      function openModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('open');
+      }
+
+      function closeModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('open');
+      }
+
+      document.querySelectorAll('[data-close-modal]').forEach(btn => {
+        btn.addEventListener('click', () => closeModal(btn.dataset.closeModal));
+      });
+
+      document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+        backdrop.addEventListener('click', (e) => {
+          if (e.target === backdrop) backdrop.classList.remove('open');
+        });
+      });
+
+      /* ======================================================================
+         5. RENDER MOVIES CATALOG + 3D CARD HOVER TILT
+         ====================================================================== */
+      function getFilteredMovies() {
+        return state.movies
+          .filter(m => {
+            if (state.activeCategory === 'now-showing' && m.category !== 'now-showing') return false;
+            if (state.activeCategory === 'coming-soon' && m.category !== 'coming-soon') return false;
+            if (state.activeCategory === 'popular' && !m.popular) return false;
+            if (state.activeGenre !== 'All' && m.genre !== state.activeGenre) return false;
+            if (state.searchQuery.trim() !== '') {
+              const q = state.searchQuery.toLowerCase();
+              const matchTitle = m.title.toLowerCase().includes(q);
+              const matchDir = m.director.toLowerCase().includes(q);
+              const matchGenre = m.genre.toLowerCase().includes(q);
+              if (!matchTitle && !matchDir && !matchGenre) return false;
+            }
+            return true;
+          })
+          .sort((a, b) => {
+            if (state.sortBy === 'rating') return b.rating - a.rating;
+            if (state.sortBy === 'duration') return b.durationMins - a.durationMins;
+            return 0;
+          });
+      }
+
+      function renderMoviesCatalog() {
+        const grid = document.getElementById('moviesGrid');
+        const list = getFilteredMovies();
+
+        if (list.length === 0) {
+          grid.innerHTML = `
+            <div class="glass-panel" style="grid-column: 1 / -1; padding: 48px; text-align: center;">
+              <h3 style="margin-bottom: 10px;">NO MOVIES MATCH YOUR FILTERS</h3>
+              <p style="color: var(--text-muted); margin-bottom: 18px;">Try clearing your search query or switching genre filters.</p>
+              <button type="button" class="btn btn-cyber btn-sm" id="resetCatalogFiltersBtn">Reset Filters</button>
+            </div>
+          `;
+          const resetBtn = document.getElementById('resetCatalogFiltersBtn');
+          if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+              state.activeCategory = 'all';
+              state.activeGenre = 'All';
+              state.searchQuery = '';
+              document.getElementById('catalogSearchInput').value = '';
+              document.getElementById('globalSearchInput').value = '';
+              syncFilterUI();
+              renderMoviesCatalog();
+            });
+          }
+          return;
+        }
+
+        grid.innerHTML = list.map(movie => {
+          const posterUrl = generateMovieArtwork(movie, false);
+          return `
+            <article class="movie-card" data-movie-id="${movie.id}">
+              <div class="movie-poster-wrap" data-action="details" data-id="${movie.id}">
+                <img src="${posterUrl}" alt="${movie.title} Poster" loading="lazy" />
+                <div class="poster-overlay-badges">
+                  <span class="rating-pill">&#9733; ${movie.rating.toFixed(1)}</span>
+                  <span class="status-pill">${movie.category === 'coming-soon' ? 'Pre-Book' : 'Now Playing'}</span>
+                </div>
+              </div>
+              <div class="movie-body">
+                <div class="movie-meta-top">
+                  <span>${movie.genre}</span>
+                  <span>${movie.duration}</span>
+                </div>
+                <h3 class="movie-title">${movie.title}</h3>
+                <div class="format-tags">
+                  ${movie.formats.map(f => `<span class="format-badge ${f.includes('IMAX') ? 'imax' : ''}">${f}</span>`).join('')}
+                </div>
+                <div class="movie-card-actions">
+                  <button type="button" class="btn btn-ghost btn-sm" data-action="details" data-id="${movie.id}">View Details</button>
+                  <button type="button" class="btn btn-primary btn-sm" data-action="book" data-id="${movie.id}">Book Now</button>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        // Attach interactive 3D tilt & button listeners
+        grid.querySelectorAll('.movie-card').forEach(card => {
+          card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            card.style.transform = `perspective(900px) rotateY(${x * 11}deg) rotateX(${-y * 11}deg) translateY(-6px)`;
+          });
+          card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg) translateY(0)';
+          });
+        });
+
+        grid.querySelectorAll('[data-action="details"]').forEach(el => {
+          el.addEventListener('click', () => openMovieDetails(el.dataset.id));
+        });
+
+        grid.querySelectorAll('[data-action="book"]').forEach(el => {
+          el.addEventListener('click', () => jumpToBookingWithMovie(el.dataset.id));
+        });
+      }
+
+      function syncFilterUI() {
+        document.querySelectorAll('#categoryTabs .tab-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.category === state.activeCategory);
+        });
+        document.querySelectorAll('#genrePills .genre-pill').forEach(p => {
+          p.classList.toggle('active', p.dataset.genre === state.activeGenre);
+        });
+      }
+
+      /* ======================================================================
+         6. MOVIE DETAILS MODAL (WITH SIMULATED TRAILER & SHOWTIME PICKER)
+         ====================================================================== */
+      function openMovieDetails(movieId) {
+        const movie = state.movies.find(m => m.id === movieId);
+        if (!movie) return;
+
+        const bannerUrl = generateMovieArtwork(movie, true);
+        const posterUrl = generateMovieArtwork(movie, false);
+        const activeBranch = state.branches.find(b => b.id === state.booking.branchId) || state.branches[0];
+
+        let selectedBranchId = activeBranch.id;
+        let selectedDate = state.booking.date;
+        let selectedFormat = movie.formats.includes(state.booking.format) ? state.booking.format : movie.formats[0];
+        let selectedTime = activeBranch.showtimes[1] || activeBranch.showtimes[0];
+
+        const container = document.getElementById('movieDetailsContent');
+        container.innerHTML = `
+          <div class="details-banner">
+            <img src="${bannerUrl}" alt="${movie.title} Banner" />
+            <div class="details-banner-grad"></div>
+          </div>
+
+          <div class="details-body">
+            <div>
+              <img src="${posterUrl}" alt="${movie.title}" class="details-poster" />
+              <button type="button" class="btn btn-cyber btn-sm" style="width: 100%; margin-top: 14px;" id="playTrailerBtn">
+                &#9654; Watch 3D Trailer
+              </button>
+            </div>
+
+            <div>
+              <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px;">
+                <span class="rating-pill">&#9733; ${movie.rating.toFixed(1)} / 10</span>
+                <span class="format-badge">${movie.genre}</span>
+                <span class="format-badge">${movie.duration}</span>
+                <span class="format-badge">${movie.releaseYear}</span>
+              </div>
+
+              <h2 style="font-size: 1.75rem; margin-bottom: 12px;">${movie.title}</h2>
+              <p style="color: #DDD6F8; font-size: 0.95rem; margin-bottom: 16px;">${movie.description}</p>
+
+              <!-- Interactive Simulated Trailer Box -->
+              <div id="trailerPlayerBox" style="display: none; margin-bottom: 18px; border-radius: 14px; overflow: hidden; border: 1px solid var(--neon-blue); background: #070314; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <span style="font-size: 0.78rem; color: var(--neon-blue); font-weight: 700;">HOLOGRAPHIC TRAILER PREVIEW • ${movie.title}</span>
+                  <button type="button" id="closeTrailerBtn" style="color: var(--hot-pink); font-weight: 700; font-size: 0.8rem;">Close Trailer</button>
+                </div>
+                <canvas id="trailerCanvas" width="640" height="220" style="width: 100%; border-radius: 10px; display: block;"></canvas>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.88rem; margin-bottom: 20px; padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.04);">
+                <div><strong style="color: var(--neon-blue);">Director:</strong> ${movie.director}</div>
+                <div><strong style="color: var(--neon-blue);">Cast:</strong> ${movie.cast.join(', ')}</div>
+              </div>
+
+              <div style="margin-bottom: 14px;">
+                <label style="font-size: 0.78rem; font-weight: 700; color: var(--neon-blue); text-transform: uppercase;">1. Select Cinema Location</label>
+                <div class="pill-choice-group" id="modalBranchPills">
+                  ${state.branches.map(b => `
+                    <button type="button" class="choice-pill ${b.id === selectedBranchId ? 'active' : ''}" data-branch="${b.id}">
+                      ${b.name.replace('Cinemora ', '')}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                <div>
+                  <label style="font-size: 0.78rem; font-weight: 700; color: var(--neon-blue); text-transform: uppercase;">2. Select Date</label>
+                  <div class="pill-choice-group" id="modalDatePills">
+                    ${['Fri, Nov 13', 'Sat, Nov 14', 'Sun, Nov 15'].map(d => `
+                      <button type="button" class="choice-pill ${d === selectedDate ? 'active' : ''}" data-date="${d}">${d}</button>
+                    `).join('')}
+                  </div>
+                </div>
+
+                <div>
+                  <label style="font-size: 0.78rem; font-weight: 700; color: var(--neon-blue); text-transform: uppercase;">3. Experience Format</label>
+                  <div class="pill-choice-group" id="modalFormatPills">
+                    ${movie.formats.map(f => `
+                      <button type="button" class="choice-pill ${f === selectedFormat ? 'active' : ''}" data-format="${f}">${f}</button>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 24px;">
+                <label style="font-size: 0.78rem; font-weight: 700; color: var(--neon-blue); text-transform: uppercase;">4. Available Showtimes</label>
+                <div class="pill-choice-group" id="modalTimePills">
+                  ${activeBranch.showtimes.map(t => `
+                    <button type="button" class="choice-pill ${t === selectedTime ? 'active' : ''}" data-time="${t}">${t}</button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-primary" style="width: 100%;" id="modalBookTicketsBtn">
+                Book Tickets for ${movie.title}
+              </button>
+            </div>
+          </div>
+        `;
+
+        openModal('movieDetailsModal');
+
+        // Interactive Pill Selectors inside Modal
+        container.querySelectorAll('#modalBranchPills .choice-pill').forEach(btn => {
+          btn.addEventListener('click', () => {
+            selectedBranchId = btn.dataset.branch;
+            container.querySelectorAll('#modalBranchPills .choice-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+          });
+        });
+
+        container.querySelectorAll('#modalDatePills .choice-pill').forEach(btn => {
+          btn.addEventListener('click', () => {
+            selectedDate = btn.dataset.date;
+            container.querySelectorAll('#modalDatePills .choice-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+          });
+        });
+
+        container.querySelectorAll('#modalFormatPills .choice-pill').forEach(btn => {
+          btn.addEventListener('click', () => {
+            selectedFormat = btn.dataset.format;
+            container.querySelectorAll('#modalFormatPills .choice-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+          });
+        });
+
+        container.querySelectorAll('#modalTimePills .choice-pill').forEach(btn => {
+          btn.addEventListener('click', () => {
+            selectedTime = btn.dataset.time;
+            container.querySelectorAll('#modalTimePills .choice-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+          });
+        });
+
+        // Simulated Holographic Trailer Animation
+        let trailerAnimId = null;
+        const playBtn = document.getElementById('playTrailerBtn');
+        const trailerBox = document.getElementById('trailerPlayerBox');
+        const closeTrailer = document.getElementById('closeTrailerBtn');
+
+        playBtn.addEventListener('click', () => {
+          trailerBox.style.display = 'block';
+          const tCanvas = document.getElementById('trailerCanvas');
+          const tCtx = tCanvas.getContext('2d');
+          let frame = 0;
+
+          const drawTrailer = () => {
+            frame++;
+            tCtx.fillStyle = '#09041A';
+            tCtx.fillRect(0, 0, tCanvas.width, tCanvas.height);
+
+            // Animated Laser Beams
+            for (let i = 0; i < 6; i++) {
+              tCtx.beginPath();
+              tCtx.moveTo(tCanvas.width / 2, 0);
+              const targetX = (Math.sin(frame * 0.03 + i) * 0.5 + 0.5) * tCanvas.width;
+              tCtx.lineTo(targetX, tCanvas.height);
+              tCtx.strokeStyle = i % 2 === 0 ? 'rgba(39, 201, 255, 0.35)' : 'rgba(255, 61, 141, 0.35)';
+              tCtx.lineWidth = 4;
+              tCtx.stroke();
+            }
+
+            // Equalizer / Waveform
+            for (let x = 20; x < tCanvas.width - 20; x += 14) {
+              const h = Math.abs(Math.sin(frame * 0.08 + x * 0.04)) * 55 + 8;
+              tCtx.fillStyle = x % 28 === 0 ? '#27C9FF' : '#7928CA';
+              tCtx.fillRect(x, tCanvas.height / 2 - h / 2, 8, h);
+            }
+
+            tCtx.fillStyle = '#FFFFFF';
+            tCtx.font = '800 18px "Orbitron", sans-serif';
+            tCtx.textAlign = 'center';
+            tCtx.fillText(`NOW PREVIEWING: ${movie.title}`, tCanvas.width / 2, 36);
+
+            tCtx.fillStyle = '#27C9FF';
+            tCtx.font = '600 12px "Space Grotesk", sans-serif';
+            tCtx.fillText(`IMAX 3D MASTER REEL • 00:${String(Math.floor((frame / 30) % 60)).padStart(2, '0')} / 02:15`, tCanvas.width / 2, tCanvas.height - 16);
+
+            if (trailerBox.style.display !== 'none') {
+              trailerAnimId = requestAnimationFrame(drawTrailer);
+            }
+          };
+          if (trailerAnimId) cancelAnimationFrame(trailerAnimId);
+          drawTrailer();
+        });
+
+        closeTrailer.addEventListener('click', () => {
+          trailerBox.style.display = 'none';
+          if (trailerAnimId) cancelAnimationFrame(trailerAnimId);
+        });
+
+        // Confirm & Jump to Seat Booking
+        document.getElementById('modalBookTicketsBtn').addEventListener('click', () => {
+          if (trailerAnimId) cancelAnimationFrame(trailerAnimId);
+          state.booking.movieId = movie.id;
+          state.booking.branchId = selectedBranchId;
+          state.booking.date = selectedDate;
+          state.booking.format = selectedFormat;
+          state.booking.time = selectedTime;
+          state.booking.selectedSeats = [];
+          closeModal('movieDetailsModal');
+          syncBookingDropdowns();
+          renderSeatMatrix();
+          updateBookingSummary();
+          document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+          showToast(`Loaded seats for ${movie.title} (${selectedTime})`);
+        });
+      }
+
+      function jumpToBookingWithMovie(movieId) {
+        const movie = state.movies.find(m => m.id === movieId);
+        if (!movie) return;
+        state.booking.movieId = movie.id;
+        if (!movie.formats.includes(state.booking.format)) {
+          state.booking.format = movie.formats[0];
+        }
+        state.booking.selectedSeats = [];
+        syncBookingDropdowns();
+        renderSeatMatrix();
+        updateBookingSummary();
+        document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+        showToast(`Selected "${movie.title}" — choose your seats below!`);
+      }
+
+      /* ======================================================================
+         7. RENDER CINEMA BRANCHES SECTION
+         ====================================================================== */
+      function renderBranches() {
+        const grid = document.getElementById('branchesGrid');
+        grid.innerHTML = state.branches.map(branch => {
+          const isSelected = branch.id === state.booking.branchId;
+          return `
+            <div class="glass-panel branch-card ${isSelected ? 'selected-branch' : ''}">
+              <div>
+                <div class="branch-header">
+                  <h3 class="branch-name">${branch.name}</h3>
+                  ${isSelected ? '<span class="rating-pill" style="border-color: var(--neon-blue); color: var(--neon-blue);">Active</span>' : ''}
+                </div>
+                <p class="branch-address">&#128205; ${branch.address}</p>
+
+                <div style="font-size: 0.78rem; color: var(--neon-blue); font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">
+                  Halls &amp; Luxury Facilities
+                </div>
+                <div class="facility-list">
+                  ${branch.facilities.map(f => `<span class="facility-chip">${f}</span>`).join('')}
+                </div>
+
+                <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">
+                  Today's Showtimes (${branch.formats.join(' / ')})
+                </div>
+                <div class="branch-showtimes">
+                  ${branch.showtimes.map(t => `<button type="button" class="time-chip" data-branch="${branch.id}" data-time="${t}">${t}</button>`).join('')}
+                </div>
+              </div>
+
+              <button type="button" class="btn ${isSelected ? 'btn-cyber' : 'btn-primary'} btn-sm" style="width: 100%;" data-select-branch="${branch.id}">
+                ${isSelected ? 'Selected Cinema' : 'Select This Branch'}
+              </button>
+            </div>
+          `;
+        }).join('');
+
+        grid.querySelectorAll('[data-select-branch]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            state.booking.branchId = btn.dataset.selectBranch;
+            state.booking.selectedSeats = [];
+            syncBookingDropdowns();
+            renderBranches();
+            renderSeatMatrix();
+            updateBookingSummary();
+            const b = state.branches.find(x => x.id === state.booking.branchId);
+            showToast(`Cinema set to ${b.name}`);
+          });
+        });
+
+        grid.querySelectorAll('.time-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            state.booking.branchId = chip.dataset.branch;
+            state.booking.time = chip.dataset.time;
+            state.booking.selectedSeats = [];
+            syncBookingDropdowns();
+            renderBranches();
+            renderSeatMatrix();
+            updateBookingSummary();
+            document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+          });
+        });
+      }
+
+      /* ======================================================================
+         8. INTERACTIVE CINEMA SEAT BOOKING ENGINE
+         ====================================================================== */
+      const ROWS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+      const COLS_LEFT = [1, 2, 3];
+      const COLS_CENTER = [4, 5, 6, 7, 8, 9];
+      const COLS_RIGHT = [10, 11, 12];
+
+      function getShowtimeKey() {
+        return `${state.booking.movieId}_${state.booking.branchId}_${state.booking.date}_${state.booking.time}`;
+      }
+
+      function getBookedSeatsForCurrentShowtime() {
+        const key = getShowtimeKey();
+        if (!state.bookedSeatsMap[key]) {
+          // Deterministic realistic pre-booked seats so auditorium feels alive
+          const hash = key.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+          const preset = ['C5', 'C6', 'D7', 'D8', 'E4', 'F6', 'F7', 'G5'];
+          if (hash % 2 === 0) preset.push('B6', 'E5', 'G8');
+          else preset.push('D4', 'E8', 'F3');
+          state.bookedSeatsMap[key] = preset;
+          saveToStorage(STORAGE_KEYS.BOOKED_SEATS, state.bookedSeatsMap);
+        }
+        return state.bookedSeatsMap[key];
+      }
+
+      function getSeatTypeAndBasePrice(rowLetter) {
+        if (rowLetter === 'F' || rowLetter === 'G') {
+          return { type: 'vip', basePrice: 22 };
+        }
+        if (rowLetter === 'H') {
+          return { type: 'accessible', basePrice: 14 };
+        }
+        return { type: 'available', basePrice: 14 };
+      }
+
+      function getFormatSurcharge() {
+        if (state.booking.format === 'IMAX 3D') return 6;
+        if (state.booking.format === '3D') return 3;
+        return 0;
+      }
+
+      function syncBookingDropdowns() {
+        const movieSel = document.getElementById('bookMovieSelect');
+        const branchSel = document.getElementById('bookBranchSelect');
+        const dateSel = document.getElementById('bookDateSelect');
+        const formatSel = document.getElementById('bookFormatSelect');
+        const timeSel = document.getElementById('bookTimeSelect');
+
+        movieSel.innerHTML = state.movies.map(m => `<option value="${m.id}">${m.title}</option>`).join('');
+        branchSel.innerHTML = state.branches.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+
+        if (!state.movies.some(m => m.id === state.booking.movieId) && state.movies.length > 0) {
+          state.booking.movieId = state.movies[0].id;
+        }
+        if (!state.branches.some(b => b.id === state.booking.branchId) && state.branches.length > 0) {
+          state.booking.branchId = state.branches[0].id;
+        }
+
+        movieSel.value = state.booking.movieId;
+        branchSel.value = state.booking.branchId;
+        dateSel.value = state.booking.date;
+        formatSel.value = state.booking.format;
+        timeSel.value = state.booking.time;
+      }
+
+      function renderSeatMatrix() {
+        const matrix = document.getElementById('seatMatrix');
+        const bookedList = getBookedSeatsForCurrentShowtime();
+        const selectedIds = new Set(state.booking.selectedSeats.map(s => s.id));
+
+        matrix.innerHTML = ROWS.map(row => {
+          const renderSeatGroup = (cols) => cols.map(col => {
+            const seatId = `${row}${col}`;
+            const isBooked = bookedList.includes(seatId);
+            const isSelected = selectedIds.has(seatId);
+            const { type, basePrice } = getSeatTypeAndBasePrice(row);
+
+            let cls = type;
+            if (isBooked) cls = 'booked';
+            if (isSelected) cls = 'selected';
+
+            const label = type === 'accessible' && !isBooked ? '&#9855;' : col;
+            const title = isBooked
+              ? `Seat ${seatId} (Booked)`
+              : `Seat ${seatId} • ${type === 'vip' ? 'VIP Recliner' : type === 'accessible' ? 'Accessible' : 'Standard'} ($${basePrice + getFormatSurcharge()})`;
+
+            return `
+              <button
+                type="button"
+                class="seat-btn ${cls}"
+                data-seat-id="${seatId}"
+                data-seat-type="${type}"
+                data-base-price="${basePrice}"
+                ${isBooked ? 'disabled' : ''}
+                title="${title}"
+              >${label}</button>
+            `;
+          }).join('');
+
+          return `
+            <div class="seat-row">
+              <span class="row-label">${row}</span>
+              ${renderSeatGroup(COLS_LEFT)}
+              <span class="seat-aisle"></span>
+              ${renderSeatGroup(COLS_CENTER)}
+              <span class="seat-aisle"></span>
+              ${renderSeatGroup(COLS_RIGHT)}
+              <span class="row-label">${row}</span>
+            </div>
+          `;
+        }).join('');
+
+        matrix.querySelectorAll('.seat-btn:not(.booked)').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const seatId = btn.dataset.seatId;
+            const seatType = btn.dataset.seatType;
+            const basePrice = Number(btn.dataset.basePrice);
+
+            const idx = state.booking.selectedSeats.findIndex(s => s.id === seatId);
+            if (idx > -1) {
+              state.booking.selectedSeats.splice(idx, 1);
+            } else {
+              if (state.booking.selectedSeats.length >= 10) {
+                showToast('Maximum 10 seats per transaction.', true);
+                return;
+              }
+              state.booking.selectedSeats.push({ id: seatId, type: seatType, basePrice });
+            }
+
+            renderSeatMatrix();
+            updateBookingSummary();
+          });
+        });
+      }
+
+      function updateBookingSummary() {
+        const movie = state.movies.find(m => m.id === state.booking.movieId) || state.movies[0];
+        const branch = state.branches.find(b => b.id === state.booking.branchId) || state.branches[0];
+        const surcharge = getFormatSurcharge();
+
+        document.getElementById('summaryPoster').src = generateMovieArtwork(movie, false);
+        document.getElementById('summaryMovieTitle').textContent = movie.title;
+        document.getElementById('summaryHall').textContent = `${branch.halls[0]} • ${movie.duration}`;
+        document.getElementById('summaryBranch').textContent = branch.name.replace('Cinemora ', '');
+        document.getElementById('summaryDateTime').textContent = `${state.booking.date} • ${state.booking.time}`;
+        document.getElementById('summaryFormat').textContent = `${state.booking.format} ${surcharge > 0 ? `(+$${surcharge}/seat)` : ''}`;
+
+        const count = state.booking.selectedSeats.length;
+        document.getElementById('summarySeatCount').textContent = `${count} ${count === 1 ? 'Seat' : 'Seats'}`;
+
+        const badgesWrap = document.getElementById('selectedSeatsBadges');
+        if (count === 0) {
+          badgesWrap.innerHTML = `<span style="font-size: 0.82rem; color: rgba(255,255,255,0.45);">Click seats in the auditorium map</span>`;
+        } else {
+          badgesWrap.innerHTML = state.booking.selectedSeats
+            .sort((a, b) => a.id.localeCompare(b.id))
+            .map(s => `<span class="seat-tag">${s.id} (${s.type === 'vip' ? 'VIP' : s.type === 'accessible' ? 'ACC' : 'STD'})</span>`)
+            .join('');
+        }
+
+        const total = state.booking.selectedSeats.reduce((sum, s) => sum + s.basePrice + surcharge, 0);
+        document.getElementById('summaryTotalPrice').textContent = `$${total.toFixed(2)}`;
+      }
+
+      /* ======================================================================
+         9. CHECKOUT INTERFACE & DIGITAL QR CODE TICKET GENERATION
+         ====================================================================== */
+      function drawQRCodeOnCanvas(canvas, textData) {
+        const ctx = canvas.getContext('2d');
+        const size = canvas.width;
+        const cells = 21;
+        const cellSize = size / cells;
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, size, size);
+
+        // Deterministic Hash Matrix
+        let hash = 2166136261;
+        for (let i = 0; i < textData.length; i++) {
+          hash ^= textData.charCodeAt(i);
+          hash = Math.imul(hash, 16777619);
+        }
+
+        const drawFinder = (gx, gy) => {
+          ctx.fillStyle = '#160B35';
+          ctx.fillRect(gx * cellSize, gy * cellSize, 7 * cellSize, 7 * cellSize);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect((gx + 1) * cellSize, (gy + 1) * cellSize, 5 * cellSize, 5 * cellSize);
+          ctx.fillStyle = '#7928CA';
+          ctx.fillRect((gx + 2) * cellSize, (gy + 2) * cellSize, 3 * cellSize, 3 * cellSize);
+        };
+
+        drawFinder(0, 0);
+        drawFinder(cells - 7, 0);
+        drawFinder(0, cells - 7);
+
+        for (let r = 0; r < cells; r++) {
+          for (let c = 0; c < cells; c++) {
+            const inTopLeft = r < 8 && c < 8;
+            const inTopRight = r < 8 && c >= cells - 8;
+            const inBottomLeft = r >= cells - 8 && c < 8;
+            if (inTopLeft || inTopRight || inBottomLeft) continue;
+
+            const bit = ((hash >>> ((r * 7 + c * 13) % 24)) ^ (r * 31 + c * 17)) & 1;
+            if (bit === 1) {
+              ctx.fillStyle = (r + c) % 4 === 0 ? '#7928CA' : '#160B35';
+              ctx.fillRect(c * cellSize, r * cellSize, cellSize - 0.4, cellSize - 0.4);
+            }
+          }
+        }
+      }
+
+      function openCheckoutFlow() {
+        if (state.booking.selectedSeats.length === 0) {
+          showToast('Please select at least 1 seat before proceeding to checkout.', true);
+          return;
+        }
+
+        const movie = state.movies.find(m => m.id === state.booking.movieId);
+        const branch = state.branches.find(b => b.id === state.booking.branchId);
+        const surcharge = getFormatSurcharge();
+        const total = state.booking.selectedSeats.reduce((sum, s) => sum + s.basePrice + surcharge, 0);
+        const seatLabels = state.booking.selectedSeats.map(s => s.id).sort().join(', ');
+
+        const defaultName = state.user ? state.user.name : '';
+        const defaultEmail = state.user ? state.user.email : '';
+
+        const content = document.getElementById('checkoutModalContent');
+        content.innerHTML = `
+          <div class="section-eyebrow">Secure Holographic Checkout</div>
+          <h2 style="font-size: 1.65rem; margin-bottom: 20px;">COMPLETE YOUR RESERVATION</h2>
+
+          <div style="display: grid; grid-template-columns: 1fr 1.15fr; gap: 24px;">
+            <!-- Order Details -->
+            <div style="padding: 20px; border-radius: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(39,201,255,0.28);">
+              <h4 style="color: var(--neon-blue); margin-bottom: 12px;">ORDER SUMMARY</h4>
+              <div class="summary-row"><span>Movie</span><span>${movie.title}</span></div>
+              <div class="summary-row"><span>Branch</span><span>${branch.name}</span></div>
+              <div class="summary-row"><span>Hall</span><span>${branch.halls[0]}</span></div>
+              <div class="summary-row"><span>Date &amp; Time</span><span>${state.booking.date} • ${state.booking.time}</span></div>
+              <div class="summary-row"><span>Format</span><span>${state.booking.format}</span></div>
+              <div class="summary-row"><span>Selected Seats (${state.booking.selectedSeats.length})</span><span style="color: var(--neon-blue);">${seatLabels}</span></div>
+              <div class="summary-total-box" style="margin-bottom: 0;">
+                <span>Total Due</span>
+                <span class="total-price-val">$${total.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <!-- Customer & Demo Payment Form -->
+            <form id="checkoutConfirmForm" class="form-grid">
+              <div class="form-field full">
+                <label for="custName">Full Name *</label>
+                <input type="text" id="custName" class="cyber-input" value="${defaultName}" placeholder="Enter your full name" required />
+              </div>
+              <div class="form-field">
+                <label for="custEmail">Email Address *</label>
+                <input type="email" id="custEmail" class="cyber-input" value="${defaultEmail}" placeholder="you@domain.com" required />
+              </div>
+              <div class="form-field">
+                <label for="custPhone">Mobile Number *</label>
+                <input type="tel" id="custPhone" class="cyber-input" placeholder="+1 (555) 234-9876" required />
+              </div>
+              <div class="form-field full">
+                <label for="paymentMethod">Demo Payment Method</label>
+                <select id="paymentMethod" class="cyber-select">
+                  <option value="cybercard">Cinemora CyberCard •••• 8842 (Instant Demo)</option>
+                  <option value="applepay">Apple Pay / Quantum Wallet</option>
+                  <option value="visa">Visa Hologram •••• 4242</option>
+                </select>
+              </div>
+              <div class="form-field full" style="margin-top: 8px;">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                  Confirm &amp; Generate Digital Ticket ($${total.toFixed(2)})
+                </button>
+              </div>
+            </form>
+          </div>
+        `;
+
+        openModal('checkoutModal');
+
+        document.getElementById('checkoutConfirmForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const custName = document.getElementById('custName').value.trim();
+          const custEmail = document.getElementById('custEmail').value.trim();
+
+          if (!custName || !custEmail.includes('@')) {
+            showToast('Please enter a valid name and email address.', true);
+            return;
+          }
+
+          const bookingRef = `CNM-${Math.floor(10000 + Math.random() * 90000)}`;
+          const seatIds = state.booking.selectedSeats.map(s => s.id).sort();
+
+          // Mark seats permanently booked for this showtime in localStorage
+          const stKey = getShowtimeKey();
+          const existingBooked = getBookedSeatsForCurrentShowtime();
+          state.bookedSeatsMap[stKey] = Array.from(new Set([...existingBooked, ...seatIds]));
+          saveToStorage(STORAGE_KEYS.BOOKED_SEATS, state.bookedSeatsMap);
+
+          // Save Booking Record
+          const newBooking = {
+            ref: bookingRef,
+            movieId: movie.id,
+            movieTitle: movie.title,
+            branchName: branch.name,
+            hall: branch.halls[0],
+            date: state.booking.date,
+            time: state.booking.time,
+            format: state.booking.format,
+            seats: seatIds,
+            totalPrice: total,
+            customerName: custName,
+            customerEmail: custEmail,
+            status: 'upcoming',
+            createdAt: new Date().toISOString()
+          };
+
+          state.bookings.unshift(newBooking);
+          saveToStorage(STORAGE_KEYS.BOOKINGS, state.bookings);
+
+          // Reset active selection
+          state.booking.selectedSeats = [];
+          renderSeatMatrix();
+          updateBookingSummary();
+          renderMyTickets();
+
+          // Render Instant Digital Ticket Confirmation inside Checkout Modal
+          content.innerHTML = `
+            <div style="text-align: center; margin-bottom: 24px;">
+              <span class="rating-pill" style="border-color: var(--neon-blue); color: var(--neon-blue); margin-bottom: 10px;">
+                &#10004; BOOKING CONFIRMED
+              </span>
+              <h2 style="font-size: 1.75rem;">YOUR DIGITAL CINEMA PASS</h2>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Saved to <strong>My Tickets</strong> • Present this QR code at the laser gate.
+              </p>
+            </div>
+
+            <div class="digital-ticket" style="max-width: 620px; margin: 0 auto 24px;">
+              <div class="ticket-main-side">
+                <span class="ticket-status-badge upcoming">CONFIRMED • ${newBooking.format}</span>
+                <h3 style="font-size: 1.25rem; margin-bottom: 6px;">${newBooking.movieTitle}</h3>
+                <p style="font-size: 0.85rem; color: var(--neon-blue); margin-bottom: 12px;">${newBooking.branchName} • ${newBooking.hall}</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.84rem;">
+                  <div><span style="color: var(--text-muted);">Date:</span> <strong>${newBooking.date}</strong></div>
+                  <div><span style="color: var(--text-muted);">Time:</span> <strong>${newBooking.time}</strong></div>
+                  <div><span style="color: var(--text-muted);">Seats:</span> <strong style="color: var(--gold-vip);">${newBooking.seats.join(', ')}</strong></div>
+                  <div><span style="color: var(--text-muted);">Paid:</span> <strong>$${newBooking.totalPrice.toFixed(2)}</strong></div>
+                </div>
+              </div>
+              <div class="ticket-qr-side">
+                <div class="qr-canvas-box">
+                  <canvas id="confirmQrCanvas" width="92" height="92"></canvas>
+                </div>
+                <span class="ticket-ref-code">${newBooking.ref}</span>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-cyber" id="viewAllMyTicketsBtn">View in My Tickets</button>
+              <button type="button" class="btn btn-primary" data-close-modal="checkoutModal">Done</button>
+            </div>
+          `;
+
+          drawQRCodeOnCanvas(document.getElementById('confirmQrCanvas'), `${newBooking.ref}|${newBooking.movieTitle}|${newBooking.seats.join(',')}`);
+
+          content.querySelector('[data-close-modal="checkoutModal"]').addEventListener('click', () => closeModal('checkoutModal'));
+          document.getElementById('viewAllMyTicketsBtn').addEventListener('click', () => {
+            closeModal('checkoutModal');
+            document.getElementById('my-tickets').scrollIntoView({ behavior: 'smooth' });
+          });
+
+          showToast(`Booking ${bookingRef} confirmed! Ticket added to My Tickets.`);
+        });
+      }
+
+      /* ======================================================================
+         10. RENDER MY TICKETS SECTION
+         ====================================================================== */
+      function renderMyTickets() {
+        document.getElementById('navTicketCount').textContent = state.bookings.length;
+        const grid = document.getElementById('myTicketsGrid');
+
+        const filtered = state.bookings.filter(b => {
+          if (state.ticketFilter === 'all') return true;
+          return b.status === state.ticketFilter;
+        });
+
+        if (filtered.length === 0) {
+          grid.innerHTML = `
+            <div class="glass-panel" style="grid-column: 1 / -1; padding: 42px; text-align: center;">
+              <h3 style="margin-bottom: 8px;">NO TICKETS IN THIS CATEGORY</h3>
+              <p style="color: var(--text-muted); margin-bottom: 16px;">Reserve your seats in the Interactive Seat Selection section to generate holographic QR passes.</p>
+              <a href="#booking" class="btn btn-primary btn-sm">Book a Movie Now</a>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = filtered.map((ticket, i) => {
+          const movie = state.movies.find(m => m.id === ticket.movieId) || state.movies[0];
+          const poster = generateMovieArtwork(movie, false);
+          return `
+            <div class="digital-ticket">
+              <div class="ticket-main-side" style="display: flex; gap: 14px; align-items: center;">
+                <img src="${poster}" alt="${ticket.movieTitle}" style="width: 66px; height: 98px; border-radius: 10px; object-fit: cover; border: 1px solid rgba(39,201,255,0.4);" />
+                <div style="flex: 1;">
+                  <span class="ticket-status-badge ${ticket.status}">${ticket.status === 'upcoming' ? 'Upcoming Pass' : 'Previous'} • ${ticket.format}</span>
+                  <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; margin-bottom: 4px;">${ticket.movieTitle}</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">${ticket.branchName}</p>
+                  <div style="font-size: 0.8rem; display: flex; flex-wrap: wrap; gap: 10px;">
+                    <span>&#128197; ${ticket.date}</span>
+                    <span>&#128338; ${ticket.time}</span>
+                    <span style="color: var(--gold-vip); font-weight: 700;">Seats: ${ticket.seats.join(', ')}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="ticket-qr-side">
+                <div class="qr-canvas-box">
+                  <canvas id="ticketQr_${i}" width="84" height="84"></canvas>
+                </div>
+                <span class="ticket-ref-code">${ticket.ref}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        filtered.forEach((ticket, i) => {
+          const canvas = document.getElementById(`ticketQr_${i}`);
+          if (canvas) {
+            drawQRCodeOnCanvas(canvas, `${ticket.ref}|${ticket.movieTitle}|${ticket.seats.join(',')}`);
+          }
+        });
+      }
+
+      /* ======================================================================
+         11. ADMINISTRATION DASHBOARD (ADD / EDIT / DELETE MOVIES, STATS, SEATS)
+         ====================================================================== */
+      function renderAdminPanel() {
+        const totalRevenue = state.bookings.reduce((sum, b) => sum + Number(b.totalPrice || 0), 0);
+        const ticketsSold = state.bookings.reduce((sum, b) => sum + (b.seats ? b.seats.length : 0), 0);
+
+        const content = document.getElementById('adminModalContent');
+        content.innerHTML = `
+          <div class="section-eyebrow">Cinemora Command Center</div>
+          <h2 style="font-size: 1.65rem; margin-bottom: 20px;">ADMINISTRATION DASHBOARD</h2>
+
+          <!-- Live KPI Stats -->
+          <div class="admin-kpi-grid">
+            <div class="kpi-card">
+              <span>Total Revenue</span>
+              <h3>$${totalRevenue.toFixed(2)}</h3>
+            </div>
+            <div class="kpi-card">
+              <span>Tickets Sold</span>
+              <h3 style="color: var(--hot-pink);">${ticketsSold}</h3>
+            </div>
+            <div class="kpi-card">
+              <span>Active Movies</span>
+              <h3 style="color: var(--gold-vip);">${state.movies.length}</h3>
+            </div>
+            <div class="kpi-card">
+              <span>Cinema Branches</span>
+              <h3>${state.branches.length}</h3>
+            </div>
+          </div>
+
+          <!-- Add / Edit Movie Form -->
+          <div style="padding: 20px; border-radius: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); margin-bottom: 24px;">
+            <h4 style="color: var(--neon-blue); margin-bottom: 14px;" id="adminFormTitle">ADD NEW MOVIE TO CATALOG</h4>
+            <form id="adminMovieForm" class="form-grid">
+              <input type="hidden" id="adminEditMovieId" value="" />
+              <div class="form-field">
+                <label for="admTitle">Movie Title *</label>
+                <input type="text" id="admTitle" class="cyber-input" placeholder="e.g. QUANTUM DRIFT" required />
+              </div>
+              <div class="form-field">
+                <label for="admGenre">Genre</label>
+                <select id="admGenre" class="cyber-select">
+                  <option value="Sci-Fi">Sci-Fi</option>
+                  <option value="Cyberpunk">Cyberpunk</option>
+                  <option value="Action">Action</option>
+                  <option value="Thriller">Thriller</option>
+                  <option value="Animation">Animation</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="admDirector">Director *</label>
+                <input type="text" id="admDirector" class="cyber-input" placeholder="Elena Vance" required />
+              </div>
+              <div class="form-field">
+                <label for="admDuration">Duration</label>
+                <input type="text" id="admDuration" class="cyber-input" value="2h 15m" required />
+              </div>
+              <div class="form-field">
+                <label for="admRating">Rating (1-10)</label>
+                <input type="number" step="0.1" min="1" max="10" id="admRating" class="cyber-input" value="9.0" required />
+              </div>
+              <div class="form-field">
+                <label for="admCategory">Release Status</label>
+                <select id="admCategory" class="cyber-select">
+                  <option value="now-showing">Now Showing</option>
+                  <option value="coming-soon">Coming Soon</option>
+                </select>
+              </div>
+              <div class="form-field full">
+                <label for="admDesc">Synopsis</label>
+                <input type="text" id="admDesc" class="cyber-input" placeholder="Enter futuristic movie synopsis..." required />
+              </div>
+              <div class="form-field full" style="display: flex; flex-direction: row; gap: 12px;">
+                <button type="submit" class="btn btn-primary btn-sm" id="admSaveBtn">Save Movie</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="admCancelEditBtn" style="display: none;">Cancel Edit</button>
+                <button type="button" class="btn btn-cyber btn-sm" id="admResetSeatsBtn" style="margin-left: auto;">Reset All Auditorium Seats</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Manage Existing Movies Table -->
+          <h4 style="color: var(--neon-blue); margin-bottom: 10px;">MANAGE MOVIES (${state.movies.length})</h4>
+          <div class="admin-table-wrap" style="margin-bottom: 24px;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Genre</th>
+                  <th>Status</th>
+                  <th>Rating</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${state.movies.map(m => `
+                  <tr>
+                    <td><strong>${m.title}</strong></td>
+                    <td>${m.genre}</td>
+                    <td>${m.category}</td>
+                    <td>&#9733; ${m.rating.toFixed(1)}</td>
+                    <td style="display: flex; gap: 8px;">
+                      <button type="button" class="btn btn-ghost btn-sm" data-adm-edit="${m.id}">Edit</button>
+                      <button type="button" class="btn btn-ghost btn-sm" style="border-color: var(--hot-pink); color: var(--hot-pink);" data-adm-del="${m.id}">Delete</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Booking Records Table -->
+          <h4 style="color: var(--neon-blue); margin-bottom: 10px;">RECENT BOOKING RECORDS (${state.bookings.length})</h4>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Ref</th>
+                  <th>Customer</th>
+                  <th>Movie</th>
+                  <th>Branch &amp; Time</th>
+                  <th>Seats</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${state.bookings.map(b => `
+                  <tr>
+                    <td style="color: var(--neon-blue); font-weight: 700;">${b.ref}</td>
+                    <td>${b.customerName}</td>
+                    <td>${b.movieTitle}</td>
+                    <td>${b.branchName.replace('Cinemora ', '')} (${b.time})</td>
+                    <td>${b.seats.join(', ')}</td>
+                    <td><strong>$${Number(b.totalPrice).toFixed(2)}</strong></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        // Form Submit (Add or Edit Movie)
+        document.getElementById('adminMovieForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const editId = document.getElementById('adminEditMovieId').value;
+          const title = document.getElementById('admTitle').value.trim().toUpperCase();
+          const genre = document.getElementById('admGenre').value;
+          const director = document.getElementById('admDirector').value.trim();
+          const duration = document.getElementById('admDuration').value.trim();
+          const rating = parseFloat(document.getElementById('admRating').value) || 8.5;
+          const category = document.getElementById('admCategory').value;
+          const description = document.getElementById('admDesc').value.trim();
+
+          if (editId) {
+            const target = state.movies.find(m => m.id === editId);
+            if (target) {
+              Object.assign(target, { title, genre, director, duration, rating, category, description });
+              showToast(`Updated "${title}"`);
+            }
+          } else {
+            state.movies.unshift({
+              id: `mov-${Date.now()}`,
+              title,
+              genre,
+              duration,
+              durationMins: 135,
+              rating,
+              category,
+              popular: true,
+              formats: ['2D', '3D', 'IMAX 3D'],
+              director,
+              cast: ['Aria Vance', 'Kaelen Voss'],
+              releaseYear: 2026,
+              palette: ['#27C9FF', '#FF3D8D', '#160B35'],
+              description
+            });
+            showToast(`Added "${title}" to catalog!`);
+          }
+
+          saveToStorage(STORAGE_KEYS.MOVIES, state.movies);
+          renderMoviesCatalog();
+          syncBookingDropdowns();
+          renderAdminPanel();
+        });
+
+        // Edit Movie Button
+        content.querySelectorAll('[data-adm-edit]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const m = state.movies.find(x => x.id === btn.dataset.admEdit);
+            if (!m) return;
+            document.getElementById('adminFormTitle').textContent = `EDIT MOVIE: ${m.title}`;
+            document.getElementById('adminEditMovieId').value = m.id;
+            document.getElementById('admTitle').value = m.title;
+            document.getElementById('admGenre').value = m.genre;
+            document.getElementById('admDirector').value = m.director;
+            document.getElementById('admDuration').value = m.duration;
+            document.getElementById('admRating').value = m.rating;
+            document.getElementById('admCategory').value = m.category;
+            document.getElementById('admDesc').value = m.description;
+            document.getElementById('admCancelEditBtn').style.display = 'inline-flex';
+          });
+        });
+
+        document.getElementById('admCancelEditBtn').addEventListener('click', () => renderAdminPanel());
+
+        // Delete Movie Button
+        content.querySelectorAll('[data-adm-del]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (state.movies.length <= 1) {
+              showToast('At least one movie must remain in the catalog.', true);
+              return;
+            }
+            state.movies = state.movies.filter(m => m.id !== btn.dataset.admDel);
+            saveToStorage(STORAGE_KEYS.MOVIES, state.movies);
+            renderMoviesCatalog();
+            syncBookingDropdowns();
+            renderAdminPanel();
+            showToast('Movie removed from catalog.');
+          });
+        });
+
+        // Reset All Seat Reservations
+        document.getElementById('admResetSeatsBtn').addEventListener('click', () => {
+          state.bookedSeatsMap = {};
+          saveToStorage(STORAGE_KEYS.BOOKED_SEATS, state.bookedSeatsMap);
+          renderSeatMatrix();
+          showToast('Auditorium seat availability reset to default.');
+        });
+      }
+
+      /* ======================================================================
+         12. THREE.JS SCENE 1: INTERACTIVE HERO 3D DIMENSION
+         ====================================================================== */
+      function initHero3DScene() {
+        const canvas = document.getElementById('hero-canvas');
+        if (!canvas || typeof THREE === 'undefined') return;
+
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x160b35, 0.032);
+
+        const camera = new THREE.PerspectiveCamera(52, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+        camera.position.set(0, 0.4, 13);
+
+        // Cinematic Lighting
+        const ambient = new THREE.AmbientLight(0x7928ca, 1.3);
+        scene.add(ambient);
+
+        const blueLight = new THREE.PointLight(0x27c9ff, 3.2, 35);
+        blueLight.position.set(6, 5, 8);
+        scene.add(blueLight);
+
+        const pinkLight = new THREE.PointLight(0xff3d8d, 2.8, 35);
+        pinkLight.position.set(-7, -3, 7);
+        scene.add(pinkLight);
+
+        const orangeLight = new THREE.PointLight(0xff7a30, 2.2, 25);
+        orangeLight.position.set(0, 6, -4);
+        scene.add(orangeLight);
+
+        // Floating 3D Movie Posters Group (Right Side Stage)
+        const stageGroup = new THREE.Group();
+        stageGroup.position.set(3.6, 0.1, 0);
+        scene.add(stageGroup);
+
+        const textureLoader = new THREE.TextureLoader();
+        const heroMovies = state.movies.slice(0, 3);
+        const posterMeshes = [];
+
+        heroMovies.forEach((m, idx) => {
+          const dataUrl = generateMovieArtwork(m, false);
+          const tex = textureLoader.load(dataUrl);
+          const geo = new THREE.BoxGeometry(2.5, 3.7, 0.12);
+          const edgeMat = new THREE.MeshStandardMaterial({
+            color: idx === 0 ? 0x27c9ff : idx === 1 ? 0xff3d8d : 0xff7a30,
+            emissive: idx === 0 ? 0x27c9ff : 0x7928ca,
+            emissiveIntensity: 0.45,
+            metalness: 0.7,
+            roughness: 0.2
+          });
+          const frontMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.25, metalness: 0.1 });
+          const mesh = new THREE.Mesh(geo, [edgeMat, edgeMat, edgeMat, edgeMat, frontMat, edgeMat]);
+
+          const angle = (idx - 1) * 0.55;
+          mesh.position.set(Math.sin(angle) * 2.5, (idx - 1) * 0.45, Math.cos(angle) * 1.4 - 1.2);
+          mesh.rotation.y = -0.35 + angle * 0.4;
+          stageGroup.add(mesh);
+          posterMeshes.push({ mesh, baseY: mesh.position.y, phase: idx * 1.8 });
+        });
+
+        // 3D Popcorn Bucket & Floating Golden Kernels
+        const popcornGroup = new THREE.Group();
+        popcornGroup.position.set(1.1, -2.1, 2.6);
+        const bucketGeo = new THREE.CylinderGeometry(0.62, 0.44, 1.15, 16);
+        const bucketMat = new THREE.MeshStandardMaterial({
+          color: 0xff3d8d,
+          emissive: 0x7928ca,
+          emissiveIntensity: 0.35,
+          roughness: 0.3
+        });
+        const bucketMesh = new THREE.Mesh(bucketGeo, bucketMat);
+        popcornGroup.add(bucketMesh);
+
+        const kernelGeo = new THREE.DodecahedronGeometry(0.18, 0);
+        const kernelMat = new THREE.MeshStandardMaterial({
+          color: 0xffd54f,
+          emissive: 0xff7a30,
+          emissiveIntensity: 0.25,
+          roughness: 0.4
+        });
+        for (let k = 0; k < 14; k++) {
+          const kernel = new THREE.Mesh(kernelGeo, kernelMat);
+          kernel.position.set(
+            (Math.random() - 0.5) * 0.9,
+            0.55 + Math.random() * 0.45,
+            (Math.random() - 0.5) * 0.9
+          );
+          popcornGroup.add(kernel);
+        }
+        stageGroup.add(popcornGroup);
+
+        // 3D Golden Holographic Cinema Ticket
+        const ticketGeo = new THREE.BoxGeometry(1.75, 0.78, 0.06);
+        const ticketMat = new THREE.MeshStandardMaterial({
+          color: 0xffb800,
+          emissive: 0xff7a30,
+          emissiveIntensity: 0.45,
+          metalness: 0.85,
+          roughness: 0.15
+        });
+        const ticketMesh = new THREE.Mesh(ticketGeo, ticketMat);
+        ticketMesh.position.set(5.4, 2.1, 2.2);
+        ticketMesh.rotation.set(0.25, -0.5, 0.22);
+        stageGroup.add(ticketMesh);
+
+        // Volumetric Neon Torus Portal Ring
+        const ringGeo = new THREE.TorusGeometry(4.4, 0.045, 16, 100);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x27c9ff, transparent: true, opacity: 0.55 });
+        const portalRing = new THREE.Mesh(ringGeo, ringMat);
+        portalRing.position.set(3.4, 0.2, -2.5);
+        scene.add(portalRing);
+
+        // Ambient Floating Particles
+        const partCount = 240;
+        const partPositions = new Float32Array(partCount * 3);
+        for (let i = 0; i < partCount * 3; i += 3) {
+          partPositions[i] = (Math.random() - 0.5) * 28;
+          partPositions[i + 1] = (Math.random() - 0.5) * 16;
+          partPositions[i + 2] = (Math.random() - 0.5) * 18;
+        }
+        const partGeo = new THREE.BufferGeometry();
+        partGeo.setAttribute('position', new THREE.BufferAttribute(partPositions, 3));
+        const partMat = new THREE.PointsMaterial({ color: 0x27c9ff, size: 0.08, transparent: true, opacity: 0.75 });
+        const particles = new THREE.Points(partGeo, partMat);
+        scene.add(particles);
+
+        // Mouse Parallax Tracking
+        let targetMouseX = 0;
+        let targetMouseY = 0;
+        window.addEventListener('mousemove', (e) => {
+          targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+          targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        window.addEventListener('resize', () => {
+          if (!canvas.parentElement) return;
+          const w = canvas.parentElement.clientWidth;
+          const h = canvas.parentElement.clientHeight;
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+          renderer.setSize(w, h, false);
+        });
+
+        const clock = new THREE.Clock();
+        function animateHero() {
+          requestAnimationFrame(animateHero);
+          const t = clock.getElapsedTime();
+
+          posterMeshes.forEach(item => {
+            item.mesh.position.y = item.baseY + Math.sin(t * 1.4 + item.phase) * 0.22;
+          });
+
+          popcornGroup.rotation.y = t * 0.6;
+          popcornGroup.position.y = -2.0 + Math.sin(t * 1.8) * 0.16;
+
+          ticketMesh.rotation.y = -0.5 + Math.sin(t * 1.3) * 0.35;
+          ticketMesh.position.y = 2.1 + Math.cos(t * 1.5) * 0.18;
+
+          portalRing.rotation.z = t * 0.18;
+          particles.rotation.y = t * 0.03;
+
+          // Responsive placement on narrow screens
+          stageGroup.position.x = window.innerWidth < 900 ? 0.4 : 3.6;
+
+          camera.position.x += (targetMouseX * 1.1 - camera.position.x) * 0.05;
+          camera.position.y += (-targetMouseY * 0.7 + 0.4 - camera.position.y) * 0.05;
+          camera.lookAt(1.4, 0, 0);
+
+          renderer.render(scene, camera);
+        }
+        animateHero();
+      }
+
+      /* ======================================================================
+         13. THREE.JS SCENE 2: DEDICATED 3D AUDITORIUM EXPERIENCE
+         ====================================================================== */
+      function initAuditorium3DExperience() {
+        const canvas = document.getElementById('auditorium-3d-canvas');
+        if (!canvas || typeof THREE === 'undefined') return;
+
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x090418);
+        scene.fog = new THREE.FogExp2(0x090418, 0.036);
+
+        const camera = new THREE.PerspectiveCamera(55, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+        let camTargetPos = new THREE.Vector3(0, 3.8, 12.5);
+        let camLookAt = new THREE.Vector3(0, 1.5, -4);
+        camera.position.copy(camTargetPos);
+
+        // Reflective Futuristic Floor Grid
+        const gridHelper = new THREE.GridHelper(34, 34, 0x27c9ff, 0x2a1466);
+        gridHelper.position.y = -1.5;
+        scene.add(gridHelper);
+
+        // Dynamic Neon Spotlights
+        const spotLeft = new THREE.SpotLight(0x27c9ff, 3.5, 40, Math.PI / 5, 0.4);
+        spotLeft.position.set(-8, 9, 6);
+        scene.add(spotLeft);
+
+        const spotRight = new THREE.SpotLight(0x7928ca, 3.5, 40, Math.PI / 5, 0.4);
+        spotRight.position.set(8, 9, 6);
+        scene.add(spotRight);
+
+        const screenGlowLight = new THREE.PointLight(0x27c9ff, 2.8, 24);
+        screenGlowLight.position.set(0, 2.4, -7.2);
+        scene.add(screenGlowLight);
+
+        // Curved Holographic Cinema Screen in 3D Room
+        const screenGeo = new THREE.CylinderGeometry(11, 11, 5.2, 32, 1, true, Math.PI * 0.82, Math.PI * 0.36);
+        const bannerTex = new THREE.TextureLoader().load(generateMovieArtwork(state.movies[0], true));
+        const screenMat = new THREE.MeshBasicMaterial({ map: bannerTex, side: THREE.DoubleSide });
+        const cinemaScreenMesh = new THREE.Mesh(screenGeo, screenMat);
+        cinemaScreenMesh.position.set(0, 2.4, 2.2);
+        scene.add(cinemaScreenMesh);
+
+        // Volumetric Light Cone from Projector to Screen
+        const beamGeo = new THREE.ConeGeometry(4.4, 15, 24, 1, true);
+        const beamMat = new THREE.MeshBasicMaterial({
+          color: 0x27c9ff,
+          transparent: true,
+          opacity: 0.08,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        });
+        const projectorBeam = new THREE.Mesh(beamGeo, beamMat);
+        projectorBeam.position.set(0, 3.4, -0.5);
+        projectorBeam.rotation.x = Math.PI / 2.15;
+        scene.add(projectorBeam);
+
+        // 3D Auditorium Seat Rows
+        const seatRowGroup = new THREE.Group();
+        const seatGeo = new THREE.BoxGeometry(0.65, 0.55, 0.55);
+        const seatMat = new THREE.MeshStandardMaterial({ color: 0x7928ca, emissive: 0x2a0f66, roughness: 0.4 });
+        for (let r = 0; r < 5; r++) {
+          for (let c = -5; c <= 5; c++) {
+            if (c === 0) continue;
+            const seat = new THREE.Mesh(seatGeo, seatMat);
+            seat.position.set(c * 0.95, -1.1 + r * 0.38, -2 + r * 1.65);
+            seatRowGroup.add(seat);
+          }
+        }
+        scene.add(seatRowGroup);
+
+        // Floating 3D Movie Posters Flanking the Auditorium
+        const galleryGroup = new THREE.Group();
+        const tLoader = new THREE.TextureLoader();
+        state.movies.slice(0, 4).forEach((m, i) => {
+          const pTex = tLoader.load(generateMovieArtwork(m, false));
+          const pMesh = new THREE.Mesh(
+            new THREE.BoxGeometry(1.7, 2.5, 0.08),
+            new THREE.MeshBasicMaterial({ map: pTex })
+          );
+          const side = i % 2 === 0 ? -1 : 1;
+          const depth = Math.floor(i / 2) * 4.5 - 3;
+          pMesh.position.set(side * 6.8, 2.2, depth);
+          pMesh.rotation.y = side * -0.55;
+          galleryGroup.add(pMesh);
+        });
+        scene.add(galleryGroup);
+
+        // Camera Presets & Ambient Lighting Controls
+        document.querySelectorAll('.cam-preset-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const mode = btn.dataset.cam;
+            if (mode === 'stage') {
+              camTargetPos.set(0, 3.8, 12.5);
+              camLookAt.set(0, 1.5, -4);
+            } else if (mode === 'balcony') {
+              camTargetPos.set(6.5, 6.4, 10.5);
+              camLookAt.set(0, 1.2, -5);
+            } else if (mode === 'projector') {
+              camTargetPos.set(-4.5, 4.8, 7.5);
+              camLookAt.set(0, 2.2, -7);
+            }
+          });
+        });
+
+        document.querySelectorAll('.light-swatch-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.light-swatch-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const hex = btn.dataset.color;
+            spotLeft.color.set(hex);
+            screenGlowLight.color.set(hex);
+            beamMat.color.set(hex);
+          });
+        });
+
+        // Mouse & Touch Drag Orbit
+        let isDragging = false;
+        let prevX = 0;
+        let yawOffset = 0;
+
+        canvas.addEventListener('mousedown', (e) => { isDragging = true; prevX = e.clientX; });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+        window.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          yawOffset += (e.clientX - prevX) * 0.006;
+          yawOffset = Math.max(-0.85, Math.min(0.85, yawOffset));
+          prevX = e.clientX;
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+          isDragging = true;
+          prevX = e.touches[0].clientX;
+        }, { passive: true });
+        canvas.addEventListener('touchend', () => { isDragging = false; });
+        canvas.addEventListener('touchmove', (e) => {
+          if (!isDragging) return;
+          yawOffset += (e.touches[0].clientX - prevX) * 0.008;
+          yawOffset = Math.max(-0.85, Math.min(0.85, yawOffset));
+          prevX = e.touches[0].clientX;
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+          if (!canvas.parentElement) return;
+          const w = canvas.parentElement.clientWidth;
+          const h = canvas.parentElement.clientHeight;
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+          renderer.setSize(w, h, false);
+        });
+
+        const clock = new THREE.Clock();
+        function animateAuditorium() {
+          requestAnimationFrame(animateAuditorium);
+          const t = clock.getElapsedTime();
+
+          galleryGroup.children.forEach((child, idx) => {
+            child.position.y = 2.2 + Math.sin(t * 1.5 + idx) * 0.25;
+          });
+
+          const desiredX = camTargetPos.x + Math.sin(yawOffset) * 8;
+          camera.position.x += (desiredX - camera.position.x) * 0.06;
+          camera.position.y += (camTargetPos.y - camera.position.y) * 0.06;
+          camera.position.z += (camTargetPos.z - camera.position.z) * 0.06;
+          camera.lookAt(camLookAt);
+
+          renderer.render(scene, camera);
+        }
+        animateAuditorium();
+      }
+
+      /* ======================================================================
+         14. GLOBAL EVENT LISTENERS & INITIALIZATION
+         ====================================================================== */
+      function bindUIEvents() {
+        // Navbar Scroll & Mobile Toggle
+        window.addEventListener('scroll', () => {
+          document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 30);
+        });
+
+        document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+          document.getElementById('navLinks').classList.toggle('open');
+        });
+
+        // Category Tabs
+        document.querySelectorAll('#categoryTabs .tab-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            state.activeCategory = btn.dataset.category;
+            syncFilterUI();
+            renderMoviesCatalog();
+          });
+        });
+
+        // Genre Filter Pills
+        document.querySelectorAll('#genrePills .genre-pill').forEach(pill => {
+          pill.addEventListener('click', () => {
+            state.activeGenre = pill.dataset.genre;
+            syncFilterUI();
+            renderMoviesCatalog();
+          });
+        });
+
+        // Search & Sort Inputs
+        const handleSearch = (val) => {
+          state.searchQuery = val;
+          renderMoviesCatalog();
+        };
+        document.getElementById('catalogSearchInput').addEventListener('input', (e) => {
+          document.getElementById('globalSearchInput').value = e.target.value;
+          handleSearch(e.target.value);
+        });
+        document.getElementById('globalSearchInput').addEventListener('input', (e) => {
+          document.getElementById('catalogSearchInput').value = e.target.value;
+          handleSearch(e.target.value);
+          if (window.scrollY < 450) {
+            document.getElementById('movies').scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+
+        document.getElementById('sortMoviesSelect').addEventListener('change', (e) => {
+          state.sortBy = e.target.value;
+          renderMoviesCatalog();
+        });
+
+        // Slider Mode Toggle & Arrows
+        const track = document.getElementById('moviesGrid');
+        document.getElementById('toggleLayoutBtn').addEventListener('click', (e) => {
+          state.sliderMode = !state.sliderMode;
+          track.classList.toggle('slider-mode', state.sliderMode);
+          e.target.textContent = state.sliderMode ? 'Grid View' : 'Slider View';
+        });
+
+        document.getElementById('sliderPrevBtn').addEventListener('click', () => {
+          if (!state.sliderMode) {
+            state.sliderMode = true;
+            track.classList.add('slider-mode');
+            document.getElementById('toggleLayoutBtn').textContent = 'Grid View';
+          }
+          track.scrollBy({ left: -330, behavior: 'smooth' });
+        });
+
+        document.getElementById('sliderNextBtn').addEventListener('click', () => {
+          if (!state.sliderMode) {
+            state.sliderMode = true;
+            track.classList.add('slider-mode');
+            document.getElementById('toggleLayoutBtn').textContent = 'Grid View';
+          }
+          track.scrollBy({ left: 330, behavior: 'smooth' });
+        });
+
+        // Booking Dropdown Changes
+        ['bookMovieSelect', 'bookBranchSelect', 'bookDateSelect', 'bookFormatSelect', 'bookTimeSelect'].forEach(id => {
+          document.getElementById(id).addEventListener('change', (e) => {
+            if (id === 'bookMovieSelect') state.booking.movieId = e.target.value;
+            if (id === 'bookBranchSelect') {
+              state.booking.branchId = e.target.value;
+              renderBranches();
+            }
+            if (id === 'bookDateSelect') state.booking.date = e.target.value;
+            if (id === 'bookFormatSelect') state.booking.format = e.target.value;
+            if (id === 'bookTimeSelect') state.booking.time = e.target.value;
+
+            state.booking.selectedSeats = [];
+            renderSeatMatrix();
+            updateBookingSummary();
+          });
+        });
+
+        document.getElementById('clearSeatsBtn').addEventListener('click', () => {
+          state.booking.selectedSeats = [];
+          renderSeatMatrix();
+          updateBookingSummary();
+        });
+
+        document.getElementById('proceedCheckoutBtn').addEventListener('click', openCheckoutFlow);
+
+        // My Tickets Filter Tabs
+        document.querySelectorAll('#ticketFilterTabs .tab-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            state.ticketFilter = btn.dataset.ticketFilter;
+            document.querySelectorAll('#ticketFilterTabs .tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderMyTickets();
+          });
+        });
+
+        // Admin Panel Trigger
+        document.getElementById('openAdminBtn').addEventListener('click', () => {
+          renderAdminPanel();
+          openModal('adminModal');
+        });
+
+        // Auth Modal & User Persistence
+        const updateAuthButton = () => {
+          const authBtn = document.getElementById('openAuthBtn');
+          if (state.user && state.user.name) {
+            authBtn.textContent = state.user.name.split(' ')[0];
+          }
+        };
+        updateAuthButton();
+
+        document.getElementById('openAuthBtn').addEventListener('click', () => openModal('authModal'));
+        document.getElementById('authForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const name = document.getElementById('authName').value.trim();
+          const email = document.getElementById('authEmail').value.trim();
+          state.user = { name, email };
+          saveToStorage(STORAGE_KEYS.USER, state.user);
+          updateAuthButton();
+          closeModal('authModal');
+          showToast(`Welcome to CINEMORA, ${name}!`);
+        });
+
+        // IntersectionObserver Scroll Reveal
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+      }
+
+      // Start Everything on Window Load
+      window.addEventListener('load', () => {
+        bindUIEvents();
+        renderMoviesCatalog();
+        renderBranches();
+        syncBookingDropdowns();
+        renderSeatMatrix();
+        updateBookingSummary();
+        renderMyTickets();
+        initHero3DScene();
+        initAuditorium3DExperience();
+      });
+    })();
+  </script>
+</body>
+</html>
